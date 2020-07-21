@@ -1,131 +1,54 @@
 'use strict';
 
-//Bring outside variables and libraries through dotenv, express, cors
 require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const pg = require('pg')
 const superagent = require('superagent');
 const morgan = require('morgan');
-const PORT = process.env.PORT;
 
-//Create an "instance" of express as our app
+const PORT = process.env.PORT || 3000;
+const client = new pg.Client(process.env.DATABASE_URL);
 const app = express();
+
 app.use(cors());
 app.use(morgan('dev'));
+app.use(express.urlencoded({ extended: true }))
+app.use(express.static('./public'));
 
-//create a SQL client connection
-const client = new pg.Client(process.env.DATABASE_URL);
-client.on('error', err => {throw err;});
-
-client.connect()
-  .then( () => {
-    app.listen(PORT, () => {
-      console.log(`Server is up on port ${PORT}.`);
-    });
-  })
-  .catch(err => {
-    throw `PG startup error: ${err.message}`;
-  })
-
-//sets the default folder to ./views folder
 app.set('view engine', 'ejs');
 
 
-// In order to deal with a form POST ... we need to tell express that we care about it
-app.use(express.urlencoded({ extended: true }))
-
-// Match any file after the '/' in the folder called '/public' near our server
-// Static or non-changing content
-// Static is a file.
-app.use(express.static('./public'));
+//----------Routes
+app.get('/', connectionTest);
+//-----Error Routes
+app.use('*', routeNotFound);
+app.use(bigError);
 
 
-//routes////////////////
 
-app.get('/', getData)
-app.get('/books/:id', getDetailHandler);
-app.post('/books', addBook);
+//----------Connection Test Function
+function connectionTest(req, res){
+  res.status(200).render('pages/home')
+}
 
-app.get('/hello',(req, res)=>{  
-  res.render('pages/index');
-})
-
-app.get(('/searches/new'), (req,resp)=>{
-  resp.render('pages/searches/new')
-})
-
-
-app.use((error,request,response,next) => {
-  console.log(error);
-  response.status(500).send("Sorry, something went wrong")
-
-});
-
+//----------Search API
 app.get('/searches', (req, res) => {
-    let url = `https://financialmodelingprep.com/api/v3/profile/AAPL?apikey=${process.env.STOCK_API}`
-  superagent.get(url)
-  .then(data =>{
-      
-      let output = data.body.map(object =>{
-        return new StockInfo(object)
-      });
+    let API = 'https://financialmodelingprep.com/api/v3/profile/AAPL';
+    let queryKey = {
+      apikey: process.env.STOCK_API
+    }
 
-    res.render('pages/searches/show', {info:output});
-  })
-  .catch((e) => {
-    console.log(e)
-    res.render('pages/error');
-  });
- 
+  superagent.get(API).query(queryKey).then(data =>{
+    let output = data.body.map(object => new StockInfo(object));
+
+    res.render('pages/stockSearch', {info:output});
+
+  }).catch(error => res.render('pages/error'));
 });
 
-///Helper Functions
-
-function addBook(req,res){
-  console.log(req.body.title)
-  console.log(req.body.author)
-  let SQL_book= 'INSERT INTO books (title, author, description, image) VALUES ($1, $2, $3, $4) RETURNING *'
-  let param = [req.body.title, req.body.author, req.body.description, req.body.image];
-
-  client.query(SQL_book, param)
-    .then(()=>{
-      res.redirect('/')
-    })
-
-}
-
-function getData(req, res){
-  let SQL = 'SELECT * from books;';
-  return client.query(SQL)
-  .then(results => {
-    let count = results.rows.length
-    console.log(results.rows)
-    console.log(count)
-    res.render('pages/index', { results: results.rows, count:count})
-  })
-  .catch(handleError);
-} 
-
-
-function handleError(error, res) {
-  console.log(error)
-  res.render('pages/error')
-}
-
-function getDetailHandler(req, res){
-  console.log(req.params)
-  let SQL_details = `SELECT * FROM books WHERE id = $1`;
-  let param = [req.params.id];
-
-  return client.query(SQL_details, param)
-    .then(results => {
-      res.render('./pages/books/details', {details: results.rows[0]})
-    })
-    .catch(handleError);
-}
-
-
+//----------Stock info Constructor
 function StockInfo(data){
   this.symbol = typeof(data.symbol) !== 'undefined' ?  (data.symbol) : ""
   this.companyName = typeof(data.companyName) !== 'undefined' ? (data.companyName) : ""
@@ -135,232 +58,18 @@ function StockInfo(data){
   this.current_price = typeof(data.price) !=='undefined' ? data.price : ""
 }
 
+//----------404 Error
+function routeNotFound(req, res) {
+  res.status(404).send('Route NOT Be Found!');
+}
 
-// //create a SQL client connection
-// const client = new pg.Client(process.env.DATABASE_URL);
-// client.on('error', err => {throw err;});
+//----------All Errors minus 404
+function bigError(error, req, res, next) {
+  console.log(error);
+  res.status(error).send('BROKEN!');
+}
 
-// let finalDataObj = {};
-
-
-// client.connect()
-//   .then( () => {
-//     app.listen(PORT, () => {
-//       console.log(`Server is up on port ${PORT}.`);
-//     });
-//   })
-//   .catch(err => {
-//     throw `PG startup error: ${err.message}`;
-//   })
-
-///////////////////////////////////////////
-
-
-// app.get('/location', (request,response) => {
-  
-  
-//   //check table for requested city 
-  
-//   const query = [request.query.city]
-//   const SQL = 'SELECT * FROM city_explorer_1 WHERE cityname = $1'
-//   client.query(SQL,query)
-//   .then (results => {
-//     console.log("received input")
-//     //save results to finalData using object Location
-//     // console.log(results.rows[0])
-//     if (results.rows[0]){
-//       finalDataObj = new Location(results.rows[0], request.query.city)
-//       // console.log(searchedLocation.cityname);
-//       // console.log(finalDataObj)
-//       console.log("msg: sent info using SQL info")
-//       response.status(200).json(finalDataObj)
-
-//     }else{
-       
-//       console.log('else statement ran')
-//       const url = `https://us1.locationiq.com/v1/search.php`;
-      
-//       let queryObject = {
-//         key: process.env.GEOCODE_API_KEY,
-//         format: 'json',
-//         q: request.query.city
-//       }
-//       console.log(url)
-//       superagent.get(url)
-//       .query(queryObject)
-//       .then(data =>{
-//         console.log("query sent")
-//         console.log(data.body[0]);
-//         finalDataObj = new Location(data.body[0], request.query.city);
-       
-              
-//         //send requested information to front-end
-//         response.status(200).send(finalDataObj);
-        
-//         //after saving object to an array of objects, save/insert request to SQL table
-//         let cityname = request.query.city
-//         let lat = finalDataObj.latitude
-//         let lon = finalDataObj.longitude
-//         let display_name = finalDataObj.formatted_query
-//         let safeQuery = [cityname, lat, lon, display_name]
-        
-//         let SQL = 'INSERT INTO city_explorer_1 (cityname, lat, lon, display_name) VALUES ($1, $2, $3, $4) RETURNING *'
-//         console.log('writing to table')
-//         //safeQuery protects against SQL injection and merges $1 with safeQuery array
-//         client.query(SQL, safeQuery)
-//           .then(results => {
-//             response.status(200).send(results);
-//           })
-//           .catch(error => {response.status(500).send(error)});  
-//       })
-  
-//       .catch((e) => {
-//         console.log(e)
-//         response.status(500).send('So sorry, something went wrong.');
-//       });
-//     };
-
-//   })
-//   .catch( error => {response.status(500).send(error)
-//   });
-  
-  
-// });
-
-
-
-
-// function Location(obj, searchQuery) {
-
-//   this.search_query = searchQuery;
-//   this.formatted_query = obj.display_name;
-//   this.latitude = obj.lat;
-//   this.longitude = obj.lon;
-  
-// }
-
-// app.get('/weather', (request,response) => {
-//   const url = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${finalDataObj.latitude}&lon=${finalDataObj.longitude}&key=${process.env.WEATHER_API_KEY}&days=8`
-//   superagent.get(url)
-//   .then(weatherData =>{
-//       let output = weatherData.body.data.map(object => {
-//       return new Weather(object.weather,object.datetime)
-//     })
-    
-//     response.status(200).send(output);
-    
-//   })
-//   .catch(() => {
-//     response.status(500).send('So sorry, something went wrong with the weather.');
-
-//   });
-
-// });
-
-// function Weather(info, time){
-//   this.forecast = info.description;
-//   this.time = new Date(time).toDateString();
-// }
-
-// app.get('/trails', (request,response) => {
-//   const url = `https://www.hikingproject.com/data/get-trails?lat=${finalDataObj.latitude}&lon=${finalDataObj.longitude}&key=${process.env.TRAIL_API_KEY}`
-//   // console.log(url)
-//   superagent.get(url)
-//   .then(data => {
-//     let output = data.body.trails.map(object => {
-//       return new Trails(object)
-      
-//     })
-
-//     response.status(200).send(output);
-//   })
-//   .catch((e) => {
-//     // console.log(e)
-//     response.status(500).send('So sorry, something went wrong with the trail info.');
-
-//   });
-
-// })
-
-// function Trails(object){
-//   this.name = object.name;
-//   this.location = object.location;
-//   this.length = object.length;
-//   this.stars = object.stars;
-//   this.stars_votes = object.starVotes;
-//   this.summary = object.summary;
-//   this.trail_url = object.url;
-//   this.conditions = object.conditionDetails
-//   this.condition_date = object.conditionDate.slice(0,10);
-//   this.condition_time = object.conditionDate.slice(11,19);
-// }
-
-// app.get('/movies', (request,response)=>{
-//   //reference to documentation: https://developers.themoviedb.org/3/search/search-movies
-//   const url = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&language=en-US&query=${finalDataObj.search_query}&page=1&include_adult=false`
-
-//   superagent.get(url)
-//   .then(data => {
-    
-//     let output = data.body.results.map(object => {
-      
-//       return new Movies(object)
-//     })
-//     console.log(output)
-//     response.status(200).send(output);
-
-//   })
-    
-//   .catch((e) => {
-//     console.log(e)
-//     response.status(500).send('So sorry, something went wrong with the movie info.');
-
-//   });
-
-// })
-
-// function Movies(object){
-//   this.title = object.title;
-//   this.overview= object.overview;
-//   this.average_votes= object.vote_average;
-//   this.total_votes= object.vote_count;
-//   this.image_url= `https://image.tmdb.org/t/p/w500${object.poster_path}`;
-//   this.popularity= object.popularity;
-//   this.released_on= object.release_date;
-// }
-
-// app.get('/yelp', (request,response)=>{
-//   //reference to documentation: https://www.yelp.com/developers/documentation/v3/business_search
-//   const url = `https://api.yelp.com/v3/businesses/search?&location=${finalDataObj.search_query}&limit=5&offset=${request.query.page*5}`
-//   // console.log(request.query.page)
-//   let queryObject = {
-//     Authorization: `Bearer ${process.env.YELP_API_KEY}`,
-//     format: 'json'
-//   }
-  
-//   superagent.get(url)
-//   .set(queryObject)
-//   .then(data => {
-//     // console.log(data.body.businesses)
-//     let output = data.body.businesses.map(object => {
-//       return new Yelp(object)
-//     })
-
-//     response.status(200).send(output);
-
-//   })
-    
-//   .catch((e) => {
-//     console.log(e)
-//     response.status(500).send('So sorry, something went wrong with the yelp info.');
-
-//   });
-// })
-
-// function Yelp(object){
-//     this.name = object.alias;
-//     this.image_url= object.image_url;
-//     this.price= object.price;
-//     this.rating= object.rating;
-//     this.url= object.url;
-// }
+//----------Listen on PORT
+client.connect(() => {
+  app.listen(PORT, () => console.log(`WORKING: ${PORT}.`));
+})
