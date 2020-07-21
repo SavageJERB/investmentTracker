@@ -14,15 +14,15 @@
         
         
             <% info.forEach(object =>{ %>
-                <img src = <%= object.image %>>
+                
                 <div> 
-                    <%= object.title %>
+                    <%= object.companyName %>
                 </div>
                 <div>
-                    <%= object.author %>
+                    <%= object.current_price %>
                 </div>
                 <div>
-                    <%= object.description %>
+                    <%= object.sector %>
                 </div>
                 
                 <form method = "POST" action = "/books">
