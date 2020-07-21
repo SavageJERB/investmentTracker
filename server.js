@@ -62,21 +62,15 @@ app.use((error,request,response,next) => {
 
 });
 
-app.post('/searches', (req, res) => {
-    let url = ""
-  if (req.body.author){
-  url = `https://www.googleapis.com/books/v1/volumes?q=inauthor:${req.body.search_entry}`
-  }else {
-  url = `https://www.googleapis.com/books/v1/volumes?q=intitle:${req.body.search_entry}`
-  }
+app.get('/searches', (req, res) => {
+    let url = `https://financialmodelingprep.com/api/v3/profile/AAPL?apikey=${process.env.STOCK_API}`
   superagent.get(url)
   .then(data =>{
       
-      let output = data.body.items.map(object =>{
-        return new BookInfo(object)
+      let output = data.body.map(object =>{
+        return new StockInfo(object)
       });
-      // console.log(output)
-    
+
     res.render('pages/searches/show', {info:output});
   })
   .catch((e) => {
@@ -132,20 +126,14 @@ function getDetailHandler(req, res){
 }
 
 
-function BookInfo(data){
-  this.title = typeof(data.volumeInfo.title) !== 'undefined' ?  (data.volumeInfo.title) : ""
-  this.image = typeof(data.volumeInfo.imageLinks.thumbnail) !== 'undefined' ? (data.volumeInfo.imageLinks.thumbnail) : `https://i.imgur.com/J5LVHEL.jpg`
-  this.author = typeof(data.volumeInfo.authors) !== 'undefined' ? data.volumeInfo.authors[0] : ""
-  this.description = typeof(data.volumeInfo.description) !== 'undefined' ? data.volumeInfo.description : ""
-  this.isbn = typeof(data.volumeInfo.industryIdentifiers) !=='undefined' ? data.volumeInfo.industryIdentifiers[0].identifier : ""
-  // this.bookshelf = typeof(data.volumeInfo.categories) !=='undefined' ? data.volumeInfo.categories[0] : "";
+function StockInfo(data){
+  this.symbol = typeof(data.symbol) !== 'undefined' ?  (data.symbol) : ""
+  this.companyName = typeof(data.companyName) !== 'undefined' ? (data.companyName) : ""
+  this.sector = typeof(data.sector) !== 'undefined' ? (data.sector) : ""
+  this.state = typeof(data.state) !=='undefined' ? data.state : ""
+  this.zip = typeof(data.zip) !=='undefined' ? data.state : ""
+  this.current_price = typeof(data.price) !=='undefined' ? data.price : ""
 }
-
-
-// app.listen(PORT, () =>{
-//   console.log(`Server is up on port ${PORT}.`);
-// })
-
 
 
 // //create a SQL client connection
