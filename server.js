@@ -30,7 +30,7 @@ app.use(bigError);
 
 //----------Connection Test Function
 function connectionTest(req, res){
-  res.status(200).render()
+  res.status(200).render('pages/home')
 }
 
 //----------Search API
@@ -43,7 +43,7 @@ app.get('/searches', (req, res) => {
   superagent.get(API).query(queryKey).then(data =>{
     let output = data.body.map(object => new StockInfo(object));
 
-    res.render('pages/searches/show', {info:output});
+    res.render('pages/stockSearch', {info:output});
 
   }).catch(error => res.render('pages/error'));
 });
