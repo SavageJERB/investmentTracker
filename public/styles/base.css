@@ -1,3 +1,26 @@
 *{
-  background-color: green;
+  background-color: rgb(170, 168, 168);
+}
+
+.button {
+  background-color: rgba(33, 33, 243, 0.897);
+  color: white;
+  padding: 15px 32px;
+  border-radius: 60px;
+  font-size: 40px;
+  line-height: 100px;
+  margin: 4% 2%; 
+  width: 100%;
+  margin: 50px auto;
+  font-family: 'Ubuntu', sans-serif;
+}
+
+.herFoo{
+  width: 90%;
+  margin-left: 5%;
+}
+
+main{
+  margin: 260px auto;
+  width: 80%;
 }
