@@ -1,4 +1,4 @@
-*{
+body{
   background-color: rgb(170, 168, 168);
 }
 
@@ -13,6 +13,7 @@
   width: 100%;
   margin: 50px auto;
   font-family: 'Ubuntu', sans-serif;
+  font-weight: bold;
 }
 
 .herFoo{
@@ -23,4 +24,32 @@
 main{
   margin: 260px auto;
   width: 80%;
+}
+
+.setting{
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 30px;
+  font-weight: 450;
+  color: white;
+  background-color: rgb(52, 52, 238);
+  line-height: 40px;
+  border-radius: 60px;
+}
+
+.importance{
+  margin-top: 60px;
+}
+
+.importance > div{
+  width: 90%;
+  margin: auto;
+}
+
+.importance > div > *{
+  width: 75%;
+  margin: 40px auto;
+}
+
+h3{
+  text-align: center;
 }

@@ -1,12 +1,36 @@
-<head>
-    <%- include('../layouts/head') %>
-</head>
-<header>
-    <%- include('../layouts/header') %>
-</header>
-<main>
-    
-</main>
-<footer>
-    <%- include('../layouts/footer') %>
-</footer>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <%- include('../layouts/head') %>
+    </head>
+    <body>
+        <header>
+            <%- include('../layouts/header') %>
+        </header>
+        <main class="setting">
+            <h3>Factors:</h3>
+            <form class="importance" action="">
+                <div>
+                    <label for="news">Importance of New Setntiments.</label></br>
+                    <input type="range" id="news" name="news" min="0" max="10">
+                </div>
+                <div>
+                    <label for="housing">Importance of Housing Market Trands located within __??__miles of companies head quarters.</label></br>
+                    <input type="range" id="housing" name="housing" min="0" max="10">
+                </div>
+                <div>
+                    <label for="violations">Importance of human rights violations.</label></br>
+                    <input type="range" id="violations" name="violations" min="0" max="10">
+                </div>
+                <div>
+                    <label for="sustainability">Importance of sustainability regarding searched companies.</label></br>
+                    <input type="range" id="sustainability" name="sustainability" min="0" max="10">
+                </div>
+            </form>
+        </main>
+        <footer>
+            <label for="">This would become the 'Home' button. Once I can have some time with the server"</label>
+            <%- include('../layouts/footer') %>
+        </footer>
+    </body>
+</html>
