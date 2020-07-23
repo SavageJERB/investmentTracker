@@ -22,33 +22,90 @@ app.set('view engine', 'ejs');
 
 //----------Routes
 app.get('/', connectionTest);
+app.get('/searches', getStockData)
+app.get('/searches_green', getGreenData)
+app.get('/searches_housing', getHousingData)
+
+
+
+
 //-----Error Routes
 app.use('*', routeNotFound);
 app.use(bigError);
 
 
 
+
+
+
 //----------Connection Test Function
 function connectionTest(req, res){
   res.status(200).render('pages/home')
+
+
 }
 
 //----------Search API
-app.get('/searches', (req, res) => {
-    let API = 'https://financialmodelingprep.com/api/v3/profile/AAPL';
-    let queryKey = {
-      apikey: process.env.STOCK_API
-    }
+function getStockData(req, res){
+  let API = 'https://financialmodelingprep.com/api/v3/profile/AAPL';
+  let queryKey = {
+    apikey: process.env.STOCK_API
+  }
 
   superagent.get(API).query(queryKey).then(data =>{
+    
     let output = data.body.map(object => new StockInfo(object));
 
     res.render('pages/stockSearch', {info:output});
 
   }).catch(error => res.render('pages/error'));
+}
+
+function getGreenData(req,res){
+  let url = 'www.apple.com'
+  let API = `http://api.thegreenwebfoundation.org/greencheck/${url}`
+  
+  superagent.get(API)
+  .then(data =>{
+    console.log(data.body)
+    let output = data.body
+
+      res.render('pages/greenSearch', {info:output});
+    }).catch(error => res.render('pages/error'));
+}
+
+function getHousingData(){
+
+  app.fetch("https://realtor.p.rapidapi.com/properties/list-sold?age_max=5&postal_code=98036&radius=10&sort=relevance&sqft_min=1000&state_code=NY&city=New%20York%20City&offset=0&limit=5", {
+	"method": "GET",
+	  "headers": {
+		  "x-rapidapi-host": "realtor.p.rapidapi.com",
+		  "x-rapidapi-key": process.env.RAPID_API_KEY
+	  }
+  })
+.then(response => {
+	console.log(response);
+})
+.catch(err => {
+	console.log(err);
 });
 
+}
+
+
+
+
+app.get ('')
+
 //----------Stock info Constructor
+
+function GreenInfo(data){
+  this.green = typeof(data.green) !== 'undefined' ? (data.green) : ''
+
+
+
+}
+
 function StockInfo(data){
   this.symbol = typeof(data.symbol) !== 'undefined' ?  (data.symbol) : ""
   this.companyName = typeof(data.companyName) !== 'undefined' ? (data.companyName) : ""
