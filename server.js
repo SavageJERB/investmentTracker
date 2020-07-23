@@ -30,7 +30,7 @@ app.use(bigError);
 
 //----------Connection Test Function
 function connectionTest(req, res){
-  res.status(200).render('pages/setting')
+  res.status(200).render('pages/watchlist_Ex')
 }
 
 //----------Search API
