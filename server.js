@@ -30,7 +30,7 @@ app.use(bigError);
 
 //----------Connection Test Function
 function connectionTest(req, res){
-  res.status(200).render('pages/search')
+  res.status(200).render('pages/setting')
 }
 
 //----------Search API

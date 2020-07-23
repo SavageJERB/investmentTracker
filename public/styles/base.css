@@ -26,7 +26,7 @@ main{
   width: 80%;
 }
 
-.setting{
+.setting, .criteria{
   font-family: 'Ubuntu', sans-serif;
   font-size: 30px;
   font-weight: 450;
@@ -53,3 +53,26 @@ main{
 h3{
   text-align: center;
 }
+
+.criteria{
+  height: 700px;
+}
+
+.criteria > *{
+  width: 90%;
+  margin: 50px auto;
+  /* margin-bottom: 100px; */
+}
+
+.criteria > div > input{
+  height: 20px;
+  font-size: 20px;
+  width: 10%;
+}
+#industry{
+  background-color: rgb(52, 52, 238);
+  font-size: 40px;
+  width: 70%;
+  height: 75px;
+}
+
