@@ -7,6 +7,7 @@ const cors = require('cors');
 const pg = require('pg')
 const superagent = require('superagent');
 const morgan = require('morgan');
+const fetch = require('node-fetch');
 
 const PORT = process.env.PORT || 3000;
 const client = new pg.Client(process.env.DATABASE_URL);
@@ -47,16 +48,22 @@ function connectionTest(req, res){
 
 //----------Search API
 function getStockData(req, res){
-  let API = 'https://financialmodelingprep.com/api/v3/profile/AAPL';
+  let API = 'https://financialmodelingprep.com/api/v3/profile/msft';
   let queryKey = {
     apikey: process.env.STOCK_API
   }
 
   superagent.get(API).query(queryKey).then(data =>{
     
-    let output = data.body.map(object => new StockInfo(object));
+    // let output = data.body.map(object => new StockInfo(object));
+    let stockInfo = data.body;
+    //constructor needs more data in it
+    getHousingData(stockInfo)
+    .then(stockInfo => {
+      res.send(stockInfo);
+      // res.render('pages/stockSearch', {info:output});
+    });
 
-    res.render('pages/stockSearch', {info:output});
 
   }).catch(error => res.render('pages/error'));
 }
@@ -74,21 +81,28 @@ function getGreenData(req,res){
     }).catch(error => res.render('pages/error'));
 }
 
-function getHousingData(){
-
-  app.fetch("https://realtor.p.rapidapi.com/properties/list-sold?age_max=5&postal_code=98036&radius=10&sort=relevance&sqft_min=1000&state_code=NY&city=New%20York%20City&offset=0&limit=5", {
-	"method": "GET",
-	  "headers": {
-		  "x-rapidapi-host": "realtor.p.rapidapi.com",
-		  "x-rapidapi-key": process.env.RAPID_API_KEY
-	  }
+function getHousingData(data){
+  console.log(data);
+  let ZIP_CODE = data[0].zip;
+  let RADIUS = 15;
+  let SQFT = 1000;
+  let MAX_AGE = 5;
+  let RESULT_LIMIT = 5;
+return fetch(`https://realtor.p.rapidapi.com/properties/list-sold?age_max=${MAX_AGE}&postal_code=${ZIP_CODE}&radius=${RADIUS}&sort=relevance&sqft_min=${SQFT}&limit=${RESULT_LIMIT}`, {
+  "method": "GET",
+    "headers": {
+      "x-rapidapi-host": "realtor.p.rapidapi.com",
+      "x-rapidapi-key": process.env.RAPID_API_KEY
+    }
   })
-.then(response => {
-	console.log(response);
-})
+.then(response => response.json())
+
+
+
 .catch(err => {
-	console.log(err);
+  console.log(err);
 });
+// property_id, sqft_raw, price_raw
 
 }
 
@@ -128,5 +142,5 @@ function bigError(error, req, res, next) {
 
 //----------Listen on PORT
 client.connect(() => {
-  app.listen(PORT, () => console.log(`WORKING: ${PORT}.`));
+  app.listen(PORT, () => console.log(`WORK: ${PORT}.`));
 })
