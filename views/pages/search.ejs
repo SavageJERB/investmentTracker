@@ -8,15 +8,17 @@
             <%- include('../layouts/header') %>
         </header>
         <main class="criteria">
-            <select name="" id="industry">
-                <option value="">All Industries</option>
-                <option value="">IndustryA</option>
-                <option value="">IndustryB</option>
-                <option value="">IndustryC</option>
-                <option value="">IndustryD</option>
-                <option value="">IndustryE</option>
-                <option value="">IndustryF</option>
-            </select>
+            <div class="ui-field-contain">
+                <select name="select-custom-20" id="select-custom-20" data-native-menu="false" class="filterable-select">
+                    <option value="">All Industries</option>
+                    <option value="">IndustryA</option>
+                    <option value="">IndustryB</option>
+                    <option value="">IndustryC</option>
+                    <option value="">IndustryD</option>
+                    <option value="">IndustryE</option>
+                    <option value="">IndustryF</option>
+                </select>
+            </div>
             <div>
                 <label for="price">Current buying price of stock:</label></br>
                 MAX<input type="number" value=10 name="price">MIN<input type="number" value=50 name="price">
