@@ -26,6 +26,7 @@ app.get('/', connectionTest);
 app.get('/searches', getStockData)
 app.get('/searches_green', getGreenData)
 app.get('/searches_housing', getHousingData)
+app.get('/sentiment', getSentimentData)
 
 
 
@@ -47,6 +48,43 @@ function connectionTest(req, res){
 }
 
 //----------Search API
+
+function getSentimentData(){
+  fetch("https://microsoft-text-analytics1.p.rapidapi.com/sentiment", {
+    "method": "POST",
+    "headers": {
+      "x-rapidapi-host": "microsoft-text-analytics1.p.rapidapi.com",
+      "x-rapidapi-key": `${process.env.RAPID_API_KEY}`,
+      "content-type": "application/json",
+      "accept": "application/json"
+    },
+    "body": JSON.stringify({
+      "documents": [
+        {
+          "id": "1",
+          "language": "en",
+          "text": "Hello world. This is some input text that I love."
+        },
+        {
+          "id": "2",
+          "language": "en",
+          "text": "It's incredibly sunny outside! I'm so happy."
+        },
+        {
+          "id": "3",
+          "language": "en",
+          "text": "Pike place market is my favorite Seattle attraction."
+        }
+      ]
+    })
+  })
+  .then(response => response.json())
+  .then(json=>console.log(json))
+  .catch(err => {
+    console.log(err);
+  });
+}
+
 function getStockData(req, res){
   let API = 'https://financialmodelingprep.com/api/v3/profile/msft';
   let queryKey = {
@@ -55,31 +93,50 @@ function getStockData(req, res){
 
   superagent.get(API).query(queryKey).then(data =>{
     
-    // let output = data.body.map(object => new StockInfo(object));
     let stockInfo = data.body;
-    //constructor needs more data in it
     getHousingData(stockInfo)
-    .then(stockInfo => {
-      res.send(stockInfo);
-      // res.render('pages/stockSearch', {info:output});
+    .then(housingData => {
+      console.log('housingData: ',housingData.listings);
     });
+    getGreenData(stockInfo)
+    .then(greenData => {
+      console.log('greenData: ',greenData.body)
+    });
+    getNewsData(stockInfo)
+    .then(newsData => {
+      console.log('newsData: ',newsData.articles[0])
+    })
+    // .then(getSentimentData(newsData.articles[0]))
 
 
-  }).catch(error => res.render('pages/error'));
-}
+  // }).catch(error => res.render('pages/error'));
+})
+};
 
-function getGreenData(req,res){
-  let url = 'www.apple.com'
-  let API = `http://api.thegreenwebfoundation.org/greencheck/${url}`
+function getNewsData(data){
+  let tickerSymbol = data[0].symbol;
+  return fetch(`https://stock-google-news.p.rapidapi.com/v1/search?when=1d&lang=en&country=US&ticker=${tickerSymbol}`, {
+	"method": "GET",
+	"headers": {
+		"x-rapidapi-host": "stock-google-news.p.rapidapi.com",
+		"x-rapidapi-key": `${process.env.RAPID_API_KEY}`
+	}
+})
+.then(response => response.json())
+// .then(json => console.log(json));
+};
+
+function getGreenData(data){
+  // let url = 'http://www.microsoft.com';
+  let url = data[0].website;
+  let newURL = url.replace('http://', '');
+  // let newURL2 = url.replace("https://", "");
+  console.log('url :',newURL);
+  let API = `http://api.thegreenwebfoundation.org/greencheck/${newURL}`
   
-  superagent.get(API)
-  .then(data =>{
-    console.log(data.body)
-    let output = data.body
+  return superagent.get(API)
 
-      res.render('pages/greenSearch', {info:output});
-    }).catch(error => res.render('pages/error'));
-}
+};
 
 function getHousingData(data){
   console.log(data);
