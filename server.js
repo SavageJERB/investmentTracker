@@ -47,6 +47,8 @@ function connectionTest(req, res){
 
 }
 
+let articlesArray = [];
+
 //----------Search API
 
 function getSentimentData(){
@@ -85,43 +87,96 @@ function getSentimentData(){
   });
 }
 
+
+
+//////////////////////////////////////
+
+
 function getStockData(req, res){
   let API = 'https://financialmodelingprep.com/api/v3/profile/msft';
   let queryKey = {
     apikey: process.env.STOCK_API
   }
 
-  superagent.get(API).query(queryKey).then(data =>{
-    
-    let stockInfo = data.body;
-    getHousingData(stockInfo)
+  superagent.get(API).query(queryKey)
+  .then(data =>{
+    let details = data.body.map(object => new StockDetails(object));
+    allInfo = details[0];
+    getHousingData(data.body)
     .then(housingData => {
-      console.log('housingData: ',housingData.listings);
+      let priceArray = [];
+      housingData.listings.forEach(object=>{
+        priceArray.push(object.price)
+      })
+      // let housingUpdate = details;
+      allInfo.listings = priceArray
+      // housingUpdate.listings = priceArray;
+      // console.log('housingData: ',housingData.listings);
     });
-    getGreenData(stockInfo)
+    getGreenData(data.body)
     .then(greenData => {
-      console.log('greenData: ',greenData.body)
+      allInfo.greencheck = greenData.green
+      console.log(allInfo)
+      // console.log('greenData: ',greenData.body)
     });
-    getNewsData(stockInfo)
+    getNewsData(data.body)
     .then(newsData => {
-      console.log('newsData: ',newsData.articles[0])
+      newsData.articles.forEach(object=>{
+        articlesArray.push(object.title) // creates an array of headline titles from news API
+        allInfo.newsTitles = articlesArray.slice(0,5); //saves to overall object the first 5 news titles
+      })
+      let documents = [];
+      for (let i = 0; i<articlesArray.length; i++){
+       documents.push({id: i, language: "en", text: articlesArray[i]})
+      }
+      let output = {documents:documents} // creats object needed for Sentiment API
+      getSentimentData(output)      
+      .then(sentimentResults=>{
+        let sentimentArray = []
+        sentimentResults.documents.forEach(object=>{
+            sentimentArray.push(object.sentiment)
+        })
+        let sentimentNumbersArray = sentimentArray.map(value=>{
+          if (value === 'negative'){
+            value = 0;
+          }else if(value === 'neutral'){
+            value = 1;
+          }else if(value === 'positive'){
+            value = 2;
+          }
+        })
+        let sentimentSum = sentimentNumbersArray.reduce((previous,current) => current += previous);
+        let sentimentAvgScore = sentimentSum / sentimentNumbersArray.length;
+        allInfo.sentimentScore = sentimentAvgScore;
+        console.log(allInfo)
+
+    
+        
+      })
+
+
+      
     })
     // .then(getSentimentData(newsData.articles[0]))
 
-
+  })
   // }).catch(error => res.render('pages/error'));
-})
 };
+
+///////////////////////////////////
+
+
+
 
 function getNewsData(data){
   let tickerSymbol = data[0].symbol;
   return fetch(`https://stock-google-news.p.rapidapi.com/v1/search?when=1d&lang=en&country=US&ticker=${tickerSymbol}`, {
-	"method": "GET",
-	"headers": {
+	  "method": "GET",
+	  "headers": {
 		"x-rapidapi-host": "stock-google-news.p.rapidapi.com",
 		"x-rapidapi-key": `${process.env.RAPID_API_KEY}`
-	}
-})
+	  }
+  })
 .then(response => response.json())
 // .then(json => console.log(json));
 };
@@ -139,28 +194,43 @@ function getGreenData(data){
 };
 
 function getHousingData(data){
-  console.log(data);
-  let ZIP_CODE = data[0].zip;
-  let RADIUS = 15;
-  let SQFT = 1000;
-  let MAX_AGE = 5;
-  let RESULT_LIMIT = 5;
-return fetch(`https://realtor.p.rapidapi.com/properties/list-sold?age_max=${MAX_AGE}&postal_code=${ZIP_CODE}&radius=${RADIUS}&sort=relevance&sqft_min=${SQFT}&limit=${RESULT_LIMIT}`, {
-  "method": "GET",
-    "headers": {
-      "x-rapidapi-host": "realtor.p.rapidapi.com",
-      "x-rapidapi-key": process.env.RAPID_API_KEY
-    }
-  })
-.then(response => response.json())
-
-
-
-.catch(err => {
-  console.log(err);
-});
+    // console.log(data);
+    let ZIP_CODE = data[0].zip;
+    let RADIUS = 15;
+    let SQFT = 1000;
+    let MAX_AGE = 5;
+    let RESULT_LIMIT = 5;
+  return fetch(`https://realtor.p.rapidapi.com/properties/list-sold?age_max=${MAX_AGE}&postal_code=${ZIP_CODE}&radius=${RADIUS}&sort=relevance&sqft_min=${SQFT}&limit=${RESULT_LIMIT}`, {
+    "method": "GET",
+      "headers": {
+        "x-rapidapi-host": "realtor.p.rapidapi.com",
+        "x-rapidapi-key": process.env.RAPID_API_KEY
+      }
+    })
+  .then(response => response.json())
+  .catch(err => {
+    console.log(err);
+  });
+}
 // property_id, sqft_raw, price_raw
 
+
+function getSentimentData(data){
+
+  return fetch("https://microsoft-text-analytics1.p.rapidapi.com/sentiment", {
+    "method": "POST",
+    "headers": {
+      "x-rapidapi-host": "microsoft-text-analytics1.p.rapidapi.com",
+      "x-rapidapi-key": "a4c90cc7bamshb0b1ddff9e9141cp1a01c1jsn6fa1375e0872",
+      "content-type": "application/json",
+      "accept": "application/json"
+    },
+    "body": JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .catch(err => {
+    console.log(err);
+  });
 }
 
 
@@ -177,14 +247,20 @@ function GreenInfo(data){
 
 }
 
-function StockInfo(data){
+function StockDetails(data){
   this.symbol = typeof(data.symbol) !== 'undefined' ?  (data.symbol) : ""
   this.companyName = typeof(data.companyName) !== 'undefined' ? (data.companyName) : ""
   this.sector = typeof(data.sector) !== 'undefined' ? (data.sector) : ""
   this.state = typeof(data.state) !=='undefined' ? data.state : ""
-  this.zip = typeof(data.zip) !=='undefined' ? data.state : ""
+  this.zip = typeof(data.zip) !=='undefined' ? data.zip : ""
   this.current_price = typeof(data.price) !=='undefined' ? data.price : ""
 }
+
+// function Headlines(data)
+
+  
+
+
 
 //----------404 Error
 function routeNotFound(req, res) {
