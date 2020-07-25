@@ -20,6 +20,30 @@ app.use(express.static('./public'));
 
 app.set('view engine', 'ejs');
 
+//+++++++++++++++++++++Render ejs pages Tests: Start+++++++++++++++++++++++++++
+app.get('/', home);
+app.get('/search', search);
+app.get('/setting', setting);
+app.get('/watchlist', watchlist_Ex);
+app.get('/results', results);
+
+function home(req, res){
+  res.status(200).render('pages/home', {title: 'Intellectual Investor', footer: 'About the Developers'});
+}
+function search(req, res){
+  res.status(200).render('pages/search', {title: 'Search', footer: 'Home'});
+}
+function setting(req, res){
+  res.status(200).render('pages/setting', {title: 'Settings', footer: 'Home'});
+}
+function watchlist_Ex(req, res){
+  res.status(200).render('pages/watchlist_Ex', {title: 'Your Watchlist', footer: 'Home'});
+}
+function results(req, res){
+  res.status(200).render('pages/watchlist_Ex', {title: 'Search Results', footer: 'Home'});
+}
+//+++++++++++++++++++++Render ejs pages Tests: End+++++++++++++++++++++++++++++
+
 
 //----------Routes
 app.get('/', connectionTest);
@@ -27,22 +51,15 @@ app.get('/searches', getStockData)
 app.get('/searches_green', getGreenData)
 app.get('/searches_housing', getHousingData)
 app.get('/sentiment', getSentimentData)
-
-
-
-
 //-----Error Routes
 app.use('*', routeNotFound);
 app.use(bigError);
 
 
-
-
-
-
 //----------Connection Test Function
 function connectionTest(req, res){
   res.status(200).render('pages/home')
+
 
 
 }
@@ -51,7 +68,7 @@ let articlesArray = [];
 
 //----------Search API
 
-function getSentimentData(){
+function getSentimentData(req, res){
   fetch("https://microsoft-text-analytics1.p.rapidapi.com/sentiment", {
     "method": "POST",
     "headers": {
@@ -81,16 +98,11 @@ function getSentimentData(){
     })
   })
   .then(response => response.json())
-  .then(json=>console.log(json))
+  .then(json => res.send(json.documents[0].sentences[1].sentiment))
   .catch(err => {
     console.log(err);
   });
 }
-
-
-
-//////////////////////////////////////
-
 
 function getStockData(req, res){
   let API = 'https://financialmodelingprep.com/api/v3/profile/msft';

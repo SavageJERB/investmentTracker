@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <%- include('../layouts/head') %>
+    </head>
+    <body>
+        <header>
+            <%- include('../layouts/header') %>
+        </header>
+        <main class="criteria">
+            <div class="radio">
+                <!-- title="Only accepts Ticker Symbols (e.g., AAPL for Apple, Inc., MSFT for Microsoft Corp.)" -->
+                <i class="fas fa-info-circle"><span>Only accepts Ticker Symbols (e.g., AAPL for Apple, Inc., MSFT for Microsoft Corp.)</span></i></br>
+                <label for="parameters">Parameters</label>
+                <input type="radio" id="params" name="search">
+                <label for="tickerS">Ticker Symbol</label>
+                <input type="radio" id="tickerS" name="search" checked="checked">
+            </div>
+            <div class="searchParams">
+                <div>
+                    <select>
+                        <option value="">All Industries</option>
+                        <option value="">IndustryA</option>
+                        <option value="">IndustryB</option>
+                        <option value="">IndustryC</option>
+                        <option value="">IndustryD</option>
+                        <option value="">IndustryE</option>
+                        <option value="">IndustryF</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="price">Current buying price of stock:</label></br>
+                    MAX<input type="number" value=10 name="price">MIN<input type="number" value=50 name="price">
+                </div>
+                <div>
+                    <label for="location">Search for comapies only in given US states</label></br>
+                    <input type="text" name="loaction">
+                </div>
+            </div>
+            <div class="searchByTicker">
+                <label for="ticker">Search Company by Ticker Symbol</label></br>
+                <input type="text" name="ticker" placeholder="Ticker">
+            </div>
+        </main>
+        <footer>
+            <%- include('../layouts/footer') %>
+        </footer>
+    </body>
+</html>
