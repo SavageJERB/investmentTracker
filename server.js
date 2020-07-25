@@ -25,6 +25,7 @@ app.get('/', home);
 app.get('/search', search);
 app.get('/setting', setting);
 app.get('/watchlist', watchlist_Ex);
+app.get('/results', results);
 
 function home(req, res){
   res.status(200).render('pages/home', {title: 'Intellectual Investor', footer: 'About the Developers'});
@@ -37,6 +38,9 @@ function setting(req, res){
 }
 function watchlist_Ex(req, res){
   res.status(200).render('pages/watchlist_Ex', {title: 'Your Watchlist', footer: 'Home'});
+}
+function results(req, res){
+  res.status(200).render('pages/watchlist_Ex', {title: 'Search Results', footer: 'Home'});
 }
 //+++++++++++++++++++++Render ejs pages Tests: End+++++++++++++++++++++++++++++
 
@@ -62,7 +66,7 @@ function connectionTest(req, res){
 
 //----------Search API
 
-function getSentimentData(){
+function getSentimentData(req, res){
   fetch("https://microsoft-text-analytics1.p.rapidapi.com/sentiment", {
     "method": "POST",
     "headers": {
@@ -92,10 +96,14 @@ function getSentimentData(){
     })
   })
   .then(response => response.json())
-  .then(json=>console.log(json))
+  .then(json => res.send(json.documents[0].sentences[1].sentiment))
   .catch(err => {
     console.log(err);
   });
+}
+
+function TryingSentiment(data){
+  this.sentiment = data.documents[0].sentences[1].sentiment
 }
 
 function getStockData(req, res){
