@@ -7,6 +7,7 @@ const cors = require('cors');
 const pg = require('pg')
 const superagent = require('superagent');
 const morgan = require('morgan');
+const fetch = require('node-fetch');
 
 const PORT = process.env.PORT || 3000;
 const client = new pg.Client(process.env.DATABASE_URL);
@@ -19,23 +20,36 @@ app.use(express.static('./public'));
 
 app.set('view engine', 'ejs');
 
+//+++++++++++++++++++++Render ejs pages Tests: Start+++++++++++++++++++++++++++
+app.get('/', home);
+app.get('/search', search);
+app.get('/setting', setting);
+app.get('/watchlist', watchlist_Ex);
+
+function home(req, res){
+  res.status(200).render('pages/home', {title: 'Intellectual Investor', footer: 'About the Developers'});
+}
+function search(req, res){
+  res.status(200).render('pages/search', {title: 'Search', footer: 'Home'});
+}
+function setting(req, res){
+  res.status(200).render('pages/setting', {title: 'Settings', footer: 'Home'});
+}
+function watchlist_Ex(req, res){
+  res.status(200).render('pages/watchlist_Ex', {title: 'Your Watchlist', footer: 'Home'});
+}
+//+++++++++++++++++++++Render ejs pages Tests: End+++++++++++++++++++++++++++++
+
 
 //----------Routes
 app.get('/', connectionTest);
 app.get('/searches', getStockData)
 app.get('/searches_green', getGreenData)
 app.get('/searches_housing', getHousingData)
-
-
-
-
+app.get('/sentiment', getSentimentData)
 //-----Error Routes
 app.use('*', routeNotFound);
 app.use(bigError);
-
-
-
-
 
 
 //----------Connection Test Function
@@ -43,52 +57,122 @@ function connectionTest(req, res){
   res.status(200).render('pages/home')
 
 
+
 }
 
 //----------Search API
+
+function getSentimentData(){
+  fetch("https://microsoft-text-analytics1.p.rapidapi.com/sentiment", {
+    "method": "POST",
+    "headers": {
+      "x-rapidapi-host": "microsoft-text-analytics1.p.rapidapi.com",
+      "x-rapidapi-key": `${process.env.RAPID_API_KEY}`,
+      "content-type": "application/json",
+      "accept": "application/json"
+    },
+    "body": JSON.stringify({
+      "documents": [
+        {
+          "id": "1",
+          "language": "en",
+          "text": "Hello world. This is some input text that I love."
+        },
+        {
+          "id": "2",
+          "language": "en",
+          "text": "It's incredibly sunny outside! I'm so happy."
+        },
+        {
+          "id": "3",
+          "language": "en",
+          "text": "Pike place market is my favorite Seattle attraction."
+        }
+      ]
+    })
+  })
+  .then(response => response.json())
+  .then(json=>console.log(json))
+  .catch(err => {
+    console.log(err);
+  });
+}
+
 function getStockData(req, res){
-  let API = 'https://financialmodelingprep.com/api/v3/profile/AAPL';
+  let API = 'https://financialmodelingprep.com/api/v3/profile/msft';
   let queryKey = {
     apikey: process.env.STOCK_API
   }
 
   superagent.get(API).query(queryKey).then(data =>{
     
-    let output = data.body.map(object => new StockInfo(object));
+    let stockInfo = data.body;
+    getHousingData(stockInfo)
+    .then(housingData => {
+      console.log('housingData: ',housingData.listings);
+    });
+    getGreenData(stockInfo)
+    .then(greenData => {
+      console.log('greenData: ',greenData.body)
+    });
+    getNewsData(stockInfo)
+    .then(newsData => {
+      console.log('newsData: ',newsData.articles[0])
+    })
+    // .then(getSentimentData(newsData.articles[0]))
 
-    res.render('pages/stockSearch', {info:output});
 
-  }).catch(error => res.render('pages/error'));
-}
-
-function getGreenData(req,res){
-  let url = 'www.apple.com'
-  let API = `http://api.thegreenwebfoundation.org/greencheck/${url}`
-  
-  superagent.get(API)
-  .then(data =>{
-    console.log(data.body)
-    let output = data.body
-
-      res.render('pages/greenSearch', {info:output});
-    }).catch(error => res.render('pages/error'));
-}
-
-function getHousingData(){
-
-  app.fetch("https://realtor.p.rapidapi.com/properties/list-sold?age_max=5&postal_code=98036&radius=10&sort=relevance&sqft_min=1000&state_code=NY&city=New%20York%20City&offset=0&limit=5", {
-	"method": "GET",
-	  "headers": {
-		  "x-rapidapi-host": "realtor.p.rapidapi.com",
-		  "x-rapidapi-key": process.env.RAPID_API_KEY
-	  }
-  })
-.then(response => {
-	console.log(response);
+  // }).catch(error => res.render('pages/error'));
 })
+};
+
+function getNewsData(data){
+  let tickerSymbol = data[0].symbol;
+  return fetch(`https://stock-google-news.p.rapidapi.com/v1/search?when=1d&lang=en&country=US&ticker=${tickerSymbol}`, {
+	"method": "GET",
+	"headers": {
+		"x-rapidapi-host": "stock-google-news.p.rapidapi.com",
+		"x-rapidapi-key": `${process.env.RAPID_API_KEY}`
+	}
+})
+.then(response => response.json())
+// .then(json => console.log(json));
+};
+
+function getGreenData(data){
+  // let url = 'http://www.microsoft.com';
+  let url = data[0].website;
+  let newURL = url.replace('http://', '');
+  // let newURL2 = url.replace("https://", "");
+  console.log('url :',newURL);
+  let API = `http://api.thegreenwebfoundation.org/greencheck/${newURL}`
+  
+  return superagent.get(API)
+
+};
+
+function getHousingData(data){
+  console.log(data);
+  let ZIP_CODE = data[0].zip;
+  let RADIUS = 15;
+  let SQFT = 1000;
+  let MAX_AGE = 5;
+  let RESULT_LIMIT = 5;
+return fetch(`https://realtor.p.rapidapi.com/properties/list-sold?age_max=${MAX_AGE}&postal_code=${ZIP_CODE}&radius=${RADIUS}&sort=relevance&sqft_min=${SQFT}&limit=${RESULT_LIMIT}`, {
+  "method": "GET",
+    "headers": {
+      "x-rapidapi-host": "realtor.p.rapidapi.com",
+      "x-rapidapi-key": process.env.RAPID_API_KEY
+    }
+  })
+.then(response => response.json())
+
+
+
 .catch(err => {
-	console.log(err);
+  console.log(err);
 });
+// property_id, sqft_raw, price_raw
 
 }
 
@@ -128,5 +212,5 @@ function bigError(error, req, res, next) {
 
 //----------Listen on PORT
 client.connect(() => {
-  app.listen(PORT, () => console.log(`WORKING: ${PORT}.`));
+  app.listen(PORT, () => console.log(`WORK: ${PORT}.`));
 })
