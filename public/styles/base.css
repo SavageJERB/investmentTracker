@@ -111,3 +111,15 @@ main > section > div > img{
   width: 60%;
   margin-left: 20%;
 }
+
+.radio{
+  width: 65%;
+  margin: auto;
+
+}
+
+.fa-info-circle{
+  position: relative;
+  left: 100%;
+  color: rgba(255, 255, 255, 0.432);
+}
