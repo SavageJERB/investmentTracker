@@ -107,8 +107,9 @@ main > section > div > button{
   
 }
 
-main > section > div > img{
-  width: 60%;
+main > section > div > iframe{
+  height: 300px;
+  width: 100%;
   margin-left: 20%;
 }
 
@@ -129,8 +130,7 @@ a{
   color: white;
 }
 
-h3{
-  /* width: 50%; */
-  /* margin: 50%; */
+.fa-info-circle:hover{
+  cursor: help;
 }
 
