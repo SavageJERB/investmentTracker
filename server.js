@@ -20,6 +20,26 @@ app.use(express.static('./public'));
 
 app.set('view engine', 'ejs');
 
+//+++++++++++++++++++++Render ejs pages Tests: Start+++++++++++++++++++++++++++
+app.get('/', home);
+app.get('/a', search);
+app.get('/b', setting);
+app.get('/c', watchlist_Ex);
+
+function home(req, res){
+  res.status(200).render('pages/home');
+}
+function search(req, res){
+  res.status(200).render('pages/search');
+}
+function setting(req, res){
+  res.status(200).render('pages/setting');
+}
+function watchlist_Ex(req, res){
+  res.status(200).render('pages/watchlist_Ex');
+}
+//+++++++++++++++++++++Render ejs pages Tests: End+++++++++++++++++++++++++++++
+
 
 //----------Routes
 app.get('/', connectionTest);
@@ -36,13 +56,10 @@ app.use('*', routeNotFound);
 app.use(bigError);
 
 
-
-
-
-
 //----------Connection Test Function
 function connectionTest(req, res){
   res.status(200).render('pages/home')
+
 
 
 }
