@@ -22,21 +22,21 @@ app.set('view engine', 'ejs');
 
 //+++++++++++++++++++++Render ejs pages Tests: Start+++++++++++++++++++++++++++
 app.get('/', home);
-app.get('/a', search);
-app.get('/b', setting);
-app.get('/c', watchlist_Ex);
+app.get('/search', search);
+app.get('/setting', setting);
+app.get('/watchlist', watchlist_Ex);
 
 function home(req, res){
-  res.status(200).render('pages/home');
+  res.status(200).render('pages/home', {title: 'Intellectual Investor', footer: 'About the Developers'});
 }
 function search(req, res){
-  res.status(200).render('pages/search');
+  res.status(200).render('pages/search', {title: 'Search', footer: 'Home'});
 }
 function setting(req, res){
-  res.status(200).render('pages/setting');
+  res.status(200).render('pages/setting', {title: 'Settings', footer: 'Home'});
 }
 function watchlist_Ex(req, res){
-  res.status(200).render('pages/watchlist_Ex');
+  res.status(200).render('pages/watchlist_Ex', {title: 'Your Watchlist', footer: 'Home'});
 }
 //+++++++++++++++++++++Render ejs pages Tests: End+++++++++++++++++++++++++++++
 
@@ -47,10 +47,6 @@ app.get('/searches', getStockData)
 app.get('/searches_green', getGreenData)
 app.get('/searches_housing', getHousingData)
 app.get('/sentiment', getSentimentData)
-
-
-
-
 //-----Error Routes
 app.use('*', routeNotFound);
 app.use(bigError);

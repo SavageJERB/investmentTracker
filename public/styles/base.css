@@ -123,3 +123,9 @@ main > section > div > img{
   left: 100%;
   color: rgba(255, 255, 255, 0.432);
 }
+
+a{
+  text-decoration: none;
+  color: white;
+}
+
