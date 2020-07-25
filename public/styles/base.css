@@ -86,7 +86,7 @@ main > section {
   border-radius: 60px;
   margin-bottom: 150px;
   height: auto;
-
+  padding-bottom: 30px;
 }
 
 main > section >div{
@@ -94,8 +94,8 @@ main > section >div{
   margin: auto;
 }
 
-main > section > div > button{
-  margin: 0 0 20px 60%;
+main > section > div > details > button{
+  margin: 0 0 50px 60%;
   background-color: white;
   color: rgba(33, 33, 243, 0.897);
   border-radius: 60px;
@@ -104,11 +104,11 @@ main > section > div > button{
   font-family: 'Ubuntu', sans-serif;
   font-weight: bold;
   width: 40%;
-  
 }
 
-main > section > div > img{
-  width: 60%;
+main > section > div > iframe{
+  height: 300px;
+  width: 100%;
   margin-left: 20%;
 }
 
@@ -127,5 +127,9 @@ main > section > div > img{
 a{
   text-decoration: none;
   color: white;
+}
+
+.fa-info-circle:hover{
+  cursor: help;
 }
 
