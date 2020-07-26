@@ -34,6 +34,7 @@ function connectionTest(req, res){
 }
 let articlesArray = [];
 //----------Search API
+
 function getSentimentData(req, res){
   fetch("https://microsoft-text-analytics1.p.rapidapi.com/sentiment", {
     "method": "POST",
@@ -69,6 +70,7 @@ function getSentimentData(req, res){
     console.log(err);
   });
 }
+
 function getStockData(req, res){
   let API = 'https://financialmodelingprep.com/api/v3/profile/msft';
   let queryKey = {
@@ -76,13 +78,15 @@ function getStockData(req, res){
   }
   superagent.get(API).query(queryKey)
   .then(data =>{
+
     // console.log(data.body);
     let details = data.body.map(object => new StockDetails(object));
+
     let allInfo = details[0];
     getHousingData(data.body)
     .then(housingData => {
       let priceArray = [];
-      console.log('++++++++++++++++++++++', housingData.listings);
+
       housingData.listings.forEach(object=>{
         priceArray.push(object.price)
       })
@@ -94,8 +98,7 @@ function getStockData(req, res){
     getGreenData(data.body)
     .then(greenData => {
       allInfo.greencheck = greenData.green
-      console.log('$$$$$$$$$$$$$$$Second all info$$$$$$$', allInfo)
-      // console.log('greenData: ',greenData.body)
+
     });
     getNewsData(data.body)
     .then(newsData => {
@@ -107,26 +110,35 @@ function getStockData(req, res){
       for (let i = 0; i<articlesArray.length; i++){
        documents.push({id: i, language: "en", text: articlesArray[i]})
       }
-      let output = {documents:documents} // creats object needed for Sentiment API
+      let output = {documents:documents} // creates object needed for Sentiment API
       getSentimentData(output)      
       .then(sentimentResults=>{
         let sentimentArray = []
+        
         sentimentResults.documents.forEach(object=>{
             sentimentArray.push(object.sentiment)
         })
         let sentimentNumbersArray = sentimentArray.map(value=>{
-          if (value === 'negative'){
-            value = 0;
-          }else if(value === 'neutral'){
-            value = 1;
-          }else if(value === 'positive'){
-            value = 2;
+          if (value == 'negative'){
+            return value = 0;
+          }else if(value == 'neutral'){
+            return value = 1;
+          }else if(value == 'positive'){
+            return value = 2;
           }
         })
         let sentimentSum = sentimentNumbersArray.reduce((previous,current) => current += previous);
-        let sentimentAvgScore = sentimentSum / sentimentNumbersArray.length;
-        allInfo.sentimentScore = sentimentAvgScore;
-        console.log('*********allinfo*******', allInfo)
+        let sentimentAvgScore = Math.round(sentimentSum / sentimentNumbersArray.length);
+        let sentimentResult = 'N/A'
+        if(sentimentAvgScore == 0){
+          sentimentResult = "Negative" 
+        }else if(sentimentAvgScore == 1){
+          sentimentResult = "Neutral"
+        }else if(sentimentAvgScore == 2){
+          sentimentResult = "Positive"
+        }
+        allInfo.sentimentScore = sentimentResult;
+
       })
       .then(response=> res.render('pages/results', {output: allInfo, title: 'Search Results', footer: 'Home'}))
     })
@@ -175,7 +187,6 @@ function getHousingData(data){
     console.log(err);
   });
 }
-// property_id, sqft_raw, price_raw
 
 function getSentimentData(data){
   return fetch("https://microsoft-text-analytics1.p.rapidapi.com/sentiment", {
@@ -203,6 +214,7 @@ function StockDetails(data){
   this.zip = typeof(data.zip) !=='undefined' ? data.zip : ""
   this.current_price = typeof(data.price) !=='undefined' ? data.price : ""
 }
+
 
 
 function stockAPI(req, res) {
@@ -248,7 +260,6 @@ function insertStocks(req, res) {
     // .catch(error => handleError(error, res));
 }
 
-
 // function Headlines(data)
 //----------404 Error
 function routeNotFound(req, res) {
@@ -261,5 +272,5 @@ function bigError(error, req, res, next) {
 }
 //----------Listen on PORT
 client.connect(() => {
-  app.listen(PORT, () => console.log(`WORK WORK WORK WORK WORK!: ${PORT}.`));
+  app.listen(PORT, () => console.log(`WORK: ${PORT}.`));
 })
