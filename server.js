@@ -6,7 +6,9 @@ const pg = require('pg')
 const superagent = require('superagent');
 const morgan = require('morgan');
 const fetch = require('node-fetch');
+
 const PORT = process.env.PORT || 3001;
+
 const client = new pg.Client(process.env.DATABASE_URL);
 const app = express();
 app.use(cors());
@@ -14,28 +16,7 @@ app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static('./public'));
 app.set('view engine', 'ejs');
-//+++++++++++++++++++++Render ejs pages Tests: Start+++++++++++++++++++++++++++
-// app.get('/', home);
-// app.get('/search', search);
-// app.get('/setting', setting);
-// app.get('/watchlist', watchlist_Ex);
-// app.get('/results', results);
-// function home(req, res){
-//   res.status(200).render('pages/home', {title: 'Intellectual Investor', footer: 'About the Developers'});
-// }
-// function search(req, res){
-//   res.status(200).render('pages/search', {title: 'Search', footer: 'Home'});
-// }
-// function setting(req, res){
-//   res.status(200).render('pages/setting', {title: 'Settings', footer: 'Home'});
-// }
-// function watchlist_Ex(req, res){
-//   res.status(200).render('pages/watchlist_Ex', {title: 'Your Watchlist', footer: 'Home'});
-// }
-// function results(req, res){
-//   res.status(200).render('pages/watchlist_Ex', {title: 'Search Results', footer: 'Home'});
-// }
-//+++++++++++++++++++++Render ejs pages Tests: End+++++++++++++++++++++++++++++
+
 //----------Routes
 app.get('/', connectionTest);
 app.get('/searches', getStockData)//----we need an app.post
@@ -166,7 +147,6 @@ function getNewsData(data){
 .then(response => response.json())
 // .then(json => console.log(json));
 };
-
 function getGreenData(data){
   // let url = 'http://www.microsoft.com';
   let url = data[0].website;
@@ -176,7 +156,6 @@ function getGreenData(data){
   let API = `http://api.thegreenwebfoundation.org/greencheck/${newURL}`
   return superagent.get(API)
 };
-
 function getHousingData(data){
     // console.log(data);
     let ZIP_CODE = data[0].zip;
@@ -215,7 +194,6 @@ function getSentimentData(data){
   });
 }
 app.get ('')
-
 //----------Stock info Constructor
 function StockDetails(data){
   this.symbol = typeof(data.symbol) !== 'undefined' ?  (data.symbol) : ""
@@ -225,6 +203,7 @@ function StockDetails(data){
   this.zip = typeof(data.zip) !=='undefined' ? data.zip : ""
   this.current_price = typeof(data.price) !=='undefined' ? data.price : ""
 }
+
 
 function stockAPI(req, res) {
   let API = 'https://financialmodelingprep.com/api/v3/profile/msft';
@@ -268,6 +247,7 @@ function insertStocks(req, res) {
     
     // .catch(error => handleError(error, res));
 }
+
 
 // function Headlines(data)
 //----------404 Error
