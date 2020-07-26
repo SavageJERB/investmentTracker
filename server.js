@@ -6,7 +6,9 @@ const pg = require('pg')
 const superagent = require('superagent');
 const morgan = require('morgan');
 const fetch = require('node-fetch');
-const PORT = process.env.PORT || 3000;
+
+const PORT = process.env.PORT || 3001;
+
 const client = new pg.Client(process.env.DATABASE_URL);
 const app = express();
 app.use(cors());
@@ -14,34 +16,15 @@ app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static('./public'));
 app.set('view engine', 'ejs');
-//+++++++++++++++++++++Render ejs pages Tests: Start+++++++++++++++++++++++++++
-app.get('/', home);
-app.get('/search', search);
-app.get('/setting', setting);
-app.get('/watchlist', watchlist_Ex);
-app.get('/results', results);
-function home(req, res){
-  res.status(200).render('pages/home', {title: 'Intellectual Investor', footer: 'About the Developers'});
-}
-function search(req, res){
-  res.status(200).render('pages/search', {title: 'Search', footer: 'Home'});
-}
-function setting(req, res){
-  res.status(200).render('pages/setting', {title: 'Settings', footer: 'Home'});
-}
-function watchlist_Ex(req, res){
-  res.status(200).render('pages/watchlist_Ex', {title: 'Your Watchlist', footer: 'Home'});
-}
-function results(req, res){
-  res.status(200).render('pages/watchlist_Ex', {title: 'Search Results', footer: 'Home'});
-}
-//+++++++++++++++++++++Render ejs pages Tests: End+++++++++++++++++++++++++++++
+
 //----------Routes
 app.get('/', connectionTest);
-app.get('/searches', getStockData)
+app.get('/searches', getStockData)//----we need an app.post
 app.get('/searches_green', getGreenData)
 app.get('/searches_housing', getHousingData)
 app.get('/sentiment', getSentimentData)
+app.get('/sqlone', insertStocks)
+
 //-----Error Routes
 app.use('*', routeNotFound);
 app.use(bigError);
@@ -193,6 +176,7 @@ function getHousingData(data){
   });
 }
 // property_id, sqft_raw, price_raw
+
 function getSentimentData(data){
   return fetch("https://microsoft-text-analytics1.p.rapidapi.com/sentiment", {
     "method": "POST",
@@ -219,6 +203,52 @@ function StockDetails(data){
   this.zip = typeof(data.zip) !=='undefined' ? data.zip : ""
   this.current_price = typeof(data.price) !=='undefined' ? data.price : ""
 }
+
+
+function stockAPI(req, res) {
+  let API = 'https://financialmodelingprep.com/api/v3/profile/msft';
+  let queryKey = {
+    apikey: process.env.STOCK_API
+  }
+
+  // superagent
+  // .get(API)
+  // .query(queryKey)
+  // .then(data =>{
+
+// }
+} 
+console.log('stock info line 256: ', process.env.PORT);
+
+function insertStocks(req, res) {
+  
+  let API = `https://financialmodelingprep.com/api/v3/quotes/nyse?apikey=${process.env.STOCK_API}`;
+  
+  superagent
+  .get(API)
+  .then(apiData => {
+    let stockInfo = apiData[0];
+
+    console.log('stock info line 256: ', apiData);
+    const safeQuery = [stockInfo.name, stockInfo.ticker, stockInfo.dayHigh, stockInfo.dayLow, stockInfo.price];
+    const SQL = `
+      INSERT INTO stock_info (name, ticker, dayhigh, daylow, price) 
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *;`;
+      client
+      .query(SQL, safeQuery)
+      // .then(results => {
+      //   let dataBaseStock = results.rows;
+      //   let show = '';
+        
+      //   res.render('pages/books/show', { data: dataBaseStock, pgName: 'Details Page', home: show, searchNew: show});
+      // })
+    })
+    
+    // .catch(error => handleError(error, res));
+}
+
+
 // function Headlines(data)
 //----------404 Error
 function routeNotFound(req, res) {
