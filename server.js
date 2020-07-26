@@ -18,12 +18,14 @@ app.use(express.static('./public'));
 app.set('view engine', 'ejs');
 
 //----------Routes
-app.get('/', connectionTest);
+app.get('/', home);
 app.get('/searches', getStockData)//----we need an app.post
 app.get('/searches_green', getGreenData)
 app.get('/searches_housing', getHousingData)
 app.get('/sentiment', getSentimentData)
 app.get('/sqlone', insertStocks)
+app.get('/search', search)
+
 
 //-----Error Routes
 app.use('*', routeNotFound);
@@ -147,6 +149,16 @@ function getStockData(req, res){
   // }).catch(error => res.render('pages/error'));
 };
 ///////////////////////////////////
+
+function search(req, res){
+  res.status(200).render('pages/search', {title: 'Search', footer: 'Home'});
+}
+
+
+function home(req, res){
+  res.status(200).render('pages/home', {title: 'Intellectual Investor', footer: 'About the Developers'});
+}
+
 function getNewsData(data){
   let tickerSymbol = data[0].symbol;
   return fetch(`https://stock-google-news.p.rapidapi.com/v1/search?when=1d&lang=en&country=US&ticker=${tickerSymbol}`, {
