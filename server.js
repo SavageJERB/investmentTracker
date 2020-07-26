@@ -1,32 +1,25 @@
 'use strict';
-
 require('dotenv').config();
-
 const express = require('express');
 const cors = require('cors');
 const pg = require('pg')
 const superagent = require('superagent');
 const morgan = require('morgan');
 const fetch = require('node-fetch');
-
 const PORT = process.env.PORT || 3000;
 const client = new pg.Client(process.env.DATABASE_URL);
 const app = express();
-
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static('./public'));
-
 app.set('view engine', 'ejs');
-
 //+++++++++++++++++++++Render ejs pages Tests: Start+++++++++++++++++++++++++++
 app.get('/', home);
 app.get('/search', search);
 app.get('/setting', setting);
 app.get('/watchlist', watchlist_Ex);
 app.get('/results', results);
-
 function home(req, res){
   res.status(200).render('pages/home', {title: 'Intellectual Investor', footer: 'About the Developers'});
 }
@@ -43,8 +36,6 @@ function results(req, res){
   res.status(200).render('pages/watchlist_Ex', {title: 'Search Results', footer: 'Home'});
 }
 //+++++++++++++++++++++Render ejs pages Tests: End+++++++++++++++++++++++++++++
-
-
 //----------Routes
 app.get('/', connectionTest);
 app.get('/searches', getStockData)
@@ -54,69 +45,26 @@ app.get('/sentiment', getSentimentData)
 //-----Error Routes
 app.use('*', routeNotFound);
 app.use(bigError);
-
-
 //----------Connection Test Function
 function connectionTest(req, res){
   res.status(200).render('pages/home')
-
-
-
 }
-
 let articlesArray = [];
 
 //----------Search API
-
-function getSentimentData(req, res){
-  fetch("https://microsoft-text-analytics1.p.rapidapi.com/sentiment", {
-    "method": "POST",
-    "headers": {
-      "x-rapidapi-host": "microsoft-text-analytics1.p.rapidapi.com",
-      "x-rapidapi-key": `${process.env.RAPID_API_KEY}`,
-      "content-type": "application/json",
-      "accept": "application/json"
-    },
-    "body": JSON.stringify({
-      "documents": [
-        {
-          "id": "1",
-          "language": "en",
-          "text": "Hello world. This is some input text that I love."
-        },
-        {
-          "id": "2",
-          "language": "en",
-          "text": "It's incredibly sunny outside! I'm so happy."
-        },
-        {
-          "id": "3",
-          "language": "en",
-          "text": "Pike place market is my favorite Seattle attraction."
-        }
-      ]
-    })
-  })
-  .then(response => response.json())
-  .then(json => res.send(json.documents[0].sentences[1].sentiment))
-  .catch(err => {
-    console.log(err);
-  });
-}
-
 function getStockData(req, res){
   let API = 'https://financialmodelingprep.com/api/v3/profile/msft';
   let queryKey = {
     apikey: process.env.STOCK_API
   }
-
   superagent.get(API).query(queryKey)
   .then(data =>{
-    let details = data.body.map(object => new StockDetails(object));
-    allInfo = details[0];
+    let details = data.body.map(object => new StockDetails(object))
+    let allInfo = details[0];
     getHousingData(data.body)
     .then(housingData => {
       let priceArray = [];
+      // console.log('++++++++++++++++++++++', housingData.listings);
       housingData.listings.forEach(object=>{
         priceArray.push(object.price)
       })
@@ -128,7 +76,7 @@ function getStockData(req, res){
     getGreenData(data.body)
     .then(greenData => {
       allInfo.greencheck = greenData.green
-      console.log(allInfo)
+      // console.log('$$$Second all info$$$', allInfo)
       // console.log('greenData: ',greenData.body)
     });
     getNewsData(data.body)
@@ -141,45 +89,44 @@ function getStockData(req, res){
       for (let i = 0; i<articlesArray.length; i++){
        documents.push({id: i, language: "en", text: articlesArray[i]})
       }
-      let output = {documents:documents} // creats object needed for Sentiment API
+      let output = {documents:documents} // creates object needed for Sentiment API
       getSentimentData(output)      
       .then(sentimentResults=>{
         let sentimentArray = []
+        
         sentimentResults.documents.forEach(object=>{
             sentimentArray.push(object.sentiment)
         })
         let sentimentNumbersArray = sentimentArray.map(value=>{
-          if (value === 'negative'){
-            value = 0;
-          }else if(value === 'neutral'){
-            value = 1;
-          }else if(value === 'positive'){
-            value = 2;
+          if (value == 'negative'){
+            return value = 0;
+          }else if(value == 'neutral'){
+            return value = 1;
+          }else if(value == 'positive'){
+            return value = 2;
           }
         })
         let sentimentSum = sentimentNumbersArray.reduce((previous,current) => current += previous);
-        let sentimentAvgScore = sentimentSum / sentimentNumbersArray.length;
-        allInfo.sentimentScore = sentimentAvgScore;
+        let sentimentAvgScore = Math.round(sentimentSum / sentimentNumbersArray.length);
+        let sentimentResult = 'N/A'
+        if(sentimentAvgScore == 0){
+          sentimentResult = "Negative" 
+        }else if(sentimentAvgScore == 1){
+          sentimentResult = "Neutral"
+        }else if(sentimentAvgScore == 2){
+          sentimentResult = "Positive"
+        }
+        allInfo.sentimentScore = sentimentResult;
+        console.log('*****allinfo******', allInfo)
         console.log(allInfo)
-
-    
-        
       })
-
-
-      
+      .then(response=> res.render('pages/results', {output: allInfo, title: 'Search Results', footer: 'Home'}))
     })
     // .then(getSentimentData(newsData.articles[0]))
-
   })
   // }).catch(error => res.render('pages/error'));
 };
-
 ///////////////////////////////////
-
-
-
-
 function getNewsData(data){
   let tickerSymbol = data[0].symbol;
   return fetch(`https://stock-google-news.p.rapidapi.com/v1/search?when=1d&lang=en&country=US&ticker=${tickerSymbol}`, {
@@ -192,19 +139,15 @@ function getNewsData(data){
 .then(response => response.json())
 // .then(json => console.log(json));
 };
-
 function getGreenData(data){
   // let url = 'http://www.microsoft.com';
   let url = data[0].website;
   let newURL = url.replace('http://', '');
   // let newURL2 = url.replace("https://", "");
-  console.log('url :',newURL);
+  // console.log('url :',newURL);
   let API = `http://api.thegreenwebfoundation.org/greencheck/${newURL}`
-  
   return superagent.get(API)
-
 };
-
 function getHousingData(data){
     // console.log(data);
     let ZIP_CODE = data[0].zip;
@@ -225,10 +168,7 @@ function getHousingData(data){
   });
 }
 // property_id, sqft_raw, price_raw
-
-
 function getSentimentData(data){
-
   return fetch("https://microsoft-text-analytics1.p.rapidapi.com/sentiment", {
     "method": "POST",
     "headers": {
@@ -244,21 +184,11 @@ function getSentimentData(data){
     console.log(err);
   });
 }
-
-
-
-
 app.get ('')
-
 //----------Stock info Constructor
-
 function GreenInfo(data){
   this.green = typeof(data.green) !== 'undefined' ? (data.green) : ''
-
-
-
 }
-
 function StockDetails(data){
   this.symbol = typeof(data.symbol) !== 'undefined' ?  (data.symbol) : ""
   this.companyName = typeof(data.companyName) !== 'undefined' ? (data.companyName) : ""
@@ -267,24 +197,16 @@ function StockDetails(data){
   this.zip = typeof(data.zip) !=='undefined' ? data.zip : ""
   this.current_price = typeof(data.price) !=='undefined' ? data.price : ""
 }
-
 // function Headlines(data)
-
-  
-
-
-
 //----------404 Error
 function routeNotFound(req, res) {
   res.status(404).send('Route NOT Be Found!');
 }
-
 //----------All Errors minus 404
 function bigError(error, req, res, next) {
   console.log(error);
   res.status(error).send('BROKEN!');
 }
-
 //----------Listen on PORT
 client.connect(() => {
   app.listen(PORT, () => console.log(`WORK: ${PORT}.`));
