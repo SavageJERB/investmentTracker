@@ -16,3 +16,8 @@ $('#tickerS').click('click', () => {
     $('.searchByTicker').show();
     $('.searchParams').hide();
 })
+
+$('.clickNav').click(nav => {
+    $('.navigation').hide();
+})
+

@@ -1,0 +1,25 @@
+.button {
+    background-color: rgba(33, 33, 243, 0.897);
+    color: white;
+    padding: 15px 32px;
+    border-radius: 60px;
+    font-size: 40px;
+    line-height: 100px;
+    margin: 4% 2%; 
+    width: 100%;
+    margin: 50px auto;
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: bold;
+  }
+
+  .navigation{
+      height: 100vh;
+      border: 2px solid black;
+      width: 20%;
+  }
+
+  .fas{
+      justify-content: space-evenly;
+      margin-bottom: 12vh;
+      /* margin: auto; */
+  }
