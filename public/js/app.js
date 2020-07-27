@@ -19,14 +19,15 @@ $('#tickerS').click('click', () => {
 
 //----------Toggle Menu
 $('.fa-bars').click('click', () => {
-    $('.setting').animate({marginLeft: '40%', opacity: 0.3}, 600);
+    $('main').animate({marginLeft: '40%', opacity: 0.3}, 600);
     $('.navigation').animate({marginLeft: '8vw'}, 600);
     $('.header').animate({marginLeft: '10%'}, 600);
+    // $('deatils').setAttr('open');
 })
 
 
 $('main').click('click', () => {
-    $('.setting').animate({marginLeft: '10%', opacity: 1}, 600);
+    $('main').animate({marginLeft: '10%', opacity: 1}, 600);
     $('.navigation').animate({marginLeft: '-19%'}, 600);
     $('.header').animate({marginLeft: '2%'}, 600);
 })
