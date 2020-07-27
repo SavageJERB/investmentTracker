@@ -25,6 +25,21 @@ app.get('/searches_housing', getHousingData)
 app.get('/sentiment', getSentimentData)
 app.get('/sqlone', insertStocks)
 app.get('/search', search)
+app.get('/watchlist', buildWatchlist)
+app.delete('/delete/:id',deleteFromWatchList);
+
+
+
+function deleteStock(req,res) {
+  
+  let SQL = 'DELETE from books WHERE id=$1;';
+  let param = [req.params.id]
+
+  client.query(SQL, param)
+    .then(()=>{
+      res.redirect('/pages/watchlist')
+    }).catch(error => console.log(error));
+}
 
 
 //-----Error Routes
@@ -150,6 +165,8 @@ function getStockData(req, res){
 };
 ///////////////////////////////////
 
+
+
 function search(req, res){
   res.status(200).render('pages/search', {title: 'Search', footer: 'Home'});
 }
@@ -158,6 +175,47 @@ function search(req, res){
 function home(req, res){
   res.status(200).render('pages/home', {title: 'Intellectual Investor', footer: 'About the Developers'});
 }
+
+function deleteFromWatchlist(req, res){
+  console.log(req.params.output_id)
+  let SQL = 'DELETE FROM investment_info WHERE id = $1';
+  let params = [req.params.output_id];
+  client.query(SQL, params).then(results => {
+    res.status(200).redirect('/watchlist');
+  }).catch(error => handleError(error, res));
+} 
+
+
+function buildWatchList(req,res){
+  let SQL = `SELECT * FROM investment_info`;
+  
+  client.query(SQL)
+    .then(results => {
+      let dataBaseInfo = results.rows;
+      console.log(dataBaseInfo);
+      res.render('pages/watchlist', { output: dataBaseInfo, title: 'Your Watchlist', footer: 'Home'});
+    })
+    .catch(error => handleError(error, res));
+}
+
+
+
+function addStock(req,res){
+
+  const SQL = 'INSERT INTO investment_info (companyName, symbol, sentimentResult, sector,current_price) VALUES ($1, $2, $3,$4,$5) RETURNING *';
+  let userInput = req.body
+  console.log(req.body)
+  const param = [userInput.companyName,userInput.symbol,userInput.sentimentResult,userInput.sector,userInput.current_price]
+  
+  client.query(SQL, param) // information being stored in database
+  .then(result =>{
+    let finalOutput = result.rows[0]
+    console.log(finalOutput)
+    res.render('/watchlist', {output:finalOutput, title: 'Your Watchlist', footer: 'Home'} )
+  })
+  .catch(()=>{
+    res.redirect('/watchlist')
+  })
 
 function getNewsData(data){
   let tickerSymbol = data[0].symbol;
