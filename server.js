@@ -6,6 +6,9 @@ const pg = require('pg')
 const superagent = require('superagent');
 const morgan = require('morgan');
 const fetch = require('node-fetch');
+const methodOverride = require('method-override');
+
+
 
 const PORT = process.env.PORT || 3001;
 
@@ -16,6 +19,8 @@ app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static('./public'));
 app.set('view engine', 'ejs');
+app.use(methodOverride('_method'));
+app.use(express.static('./public'));
 
 //----------Routes
 app.get('/', home);
@@ -25,19 +30,20 @@ app.get('/searches_housing', getHousingData)
 app.get('/sentiment', getSentimentData)
 app.get('/sqlone', insertStocks)
 app.get('/search', search)
-app.get('/watchlist', buildWatchlist)
-app.delete('/delete/:id',deleteFromWatchList);
+app.get('/watchlist', buildWatchList)
+app.delete('/delete/:id',deleteStock);
 
 
 
 function deleteStock(req,res) {
   
-  let SQL = 'DELETE from books WHERE id=$1;';
+  let SQL = 'DELETE from investment_info WHERE id=$1;';
   let param = [req.params.id]
+  console.log(param)
 
   client.query(SQL, param)
     .then(()=>{
-      res.redirect('/pages/watchlist')
+      res.redirect('/')
     }).catch(error => console.log(error));
 }
 
@@ -176,14 +182,14 @@ function home(req, res){
   res.status(200).render('pages/home', {title: 'Intellectual Investor', footer: 'About the Developers'});
 }
 
-function deleteFromWatchlist(req, res){
-  console.log(req.params.output_id)
-  let SQL = 'DELETE FROM investment_info WHERE id = $1';
-  let params = [req.params.output_id];
-  client.query(SQL, params).then(results => {
-    res.status(200).redirect('/watchlist');
-  }).catch(error => handleError(error, res));
-} 
+// function deleteFromWatchlist(req, res){
+//   console.log(req.params.output_id)
+//   let SQL = 'DELETE FROM investment_info WHERE id = $1';
+//   let params = [req.params.output_id];
+//   client.query(SQL, params).then(results => {
+//     res.status(200).redirect('/watchlist');
+//   }).catch(error => handleError(error, res));
+// } 
 
 
 function buildWatchList(req,res){
@@ -216,6 +222,7 @@ function addStock(req,res){
   .catch(()=>{
     res.redirect('/watchlist')
   })
+};
 
 function getNewsData(data){
   let tickerSymbol = data[0].symbol;
@@ -229,6 +236,7 @@ function getNewsData(data){
 .then(response => response.json())
 // .then(json => console.log(json));
 };
+
 function getGreenData(data){
   // let url = 'http://www.microsoft.com';
   let url = data[0].website;
@@ -238,6 +246,7 @@ function getGreenData(data){
   let API = `http://api.thegreenwebfoundation.org/greencheck/${newURL}`
   return superagent.get(API)
 };
+
 function getHousingData(data){
     // console.log(data);
     let ZIP_CODE = data[0].zip;
