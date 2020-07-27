@@ -1,24 +1,25 @@
 'use strict';
+
 require('dotenv').config();
-const express = require('express');
+
 const cors = require('cors');
+const methodOverride = require('method-override');
+const express = require('express');
 const pg = require('pg')
 const superagent = require('superagent');
 const morgan = require('morgan');
 const fetch = require('node-fetch');
-const methodOverride = require('method-override');
-
-
 
 const PORT = process.env.PORT || 3001;
-
 const client = new pg.Client(process.env.DATABASE_URL);
 const app = express();
+
+app.set('view engine', 'ejs');
+
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static('./public'));
-app.set('view engine', 'ejs');
 app.use(methodOverride('_method'));
 app.use(express.static('./public'));
 
@@ -32,9 +33,17 @@ app.get('/sqlone', insertStocks)
 app.get('/search', search)
 app.get('/watchlist', buildWatchList)
 app.delete('/delete/:id',deleteStock);
+//-----Error Routes
+app.use('*', routeNotFound);
+app.use(bigError);
+
+//----------Use For Connection Tests
+function connectionTest(req, res){
+  res.status(200).render('pages/home')
+}
 
 
-
+//----------Delete Stock from Watchlist
 function deleteStock(req,res) {
   
   let SQL = 'DELETE from investment_info WHERE id=$1;';
@@ -48,16 +57,9 @@ function deleteStock(req,res) {
 }
 
 
-//-----Error Routes
-app.use('*', routeNotFound);
-app.use(bigError);
-//----------Connection Test Function
-function connectionTest(req, res){
-  res.status(200).render('pages/home')
-}
 let articlesArray = [];
-//----------Search API
 
+//----------Search Sentiment API
 function getSentimentData(req, res){
   fetch("https://microsoft-text-analytics1.p.rapidapi.com/sentiment", {
     "method": "POST",
@@ -94,6 +96,7 @@ function getSentimentData(req, res){
   });
 }
 
+//----------Stock Data API
 function getStockData(req, res){
   let API = 'https://financialmodelingprep.com/api/v3/profile/msft';
   let queryKey = {
@@ -169,29 +172,18 @@ function getStockData(req, res){
   })
   // }).catch(error => res.render('pages/error'));
 };
-///////////////////////////////////
 
-
-
+//----------Search for Stocks Page
 function search(req, res){
   res.status(200).render('pages/search', {title: 'Search', footer: 'Home'});
 }
 
-
+//----------Home Page
 function home(req, res){
   res.status(200).render('pages/home', {title: 'Intellectual Investor', footer: 'About the Developers'});
 }
 
-// function deleteFromWatchlist(req, res){
-//   console.log(req.params.output_id)
-//   let SQL = 'DELETE FROM investment_info WHERE id = $1';
-//   let params = [req.params.output_id];
-//   client.query(SQL, params).then(results => {
-//     res.status(200).redirect('/watchlist');
-//   }).catch(error => handleError(error, res));
-// } 
-
-
+//----------Get Data from Database for Watchlist
 function buildWatchList(req,res){
   let SQL = `SELECT * FROM investment_info`;
   
@@ -203,7 +195,7 @@ function buildWatchList(req,res){
     }).catch(err => console.log(err));
 }
 
-
+//----------Add Stock to Watchlist
 function addStock(req,res){
 
   const SQL = 'INSERT INTO investment_info (companyName, symbol, sentimentResult, sector,current_price) VALUES ($1, $2, $3,$4,$5) RETURNING *';
@@ -221,7 +213,7 @@ function addStock(req,res){
     res.redirect('/watchlist')
   })
 };
-
+//----------News, Green, Housing, and Sentiment APIs Below
 function getNewsData(data){
   let tickerSymbol = data[0].symbol;
   return fetch(`https://stock-google-news.p.rapidapi.com/v1/search?when=1d&lang=en&country=US&ticker=${tickerSymbol}`, {
@@ -281,7 +273,9 @@ function getSentimentData(data){
     console.log(err);
   });
 }
+
 app.get ('')
+
 //----------Stock info Constructor
 function StockDetails(data){
   this.symbol = typeof(data.symbol) !== 'undefined' ?  (data.symbol) : ""
@@ -309,6 +303,7 @@ function stockAPI(req, res) {
 } 
 console.log('stock info line 256: ', process.env.PORT);
 
+//----------Add Stock to Database
 function insertStocks(req, res) {
   
   let API = `https://financialmodelingprep.com/api/v3/quotes/nyse?apikey=${process.env.STOCK_API}`;
@@ -338,6 +333,7 @@ function insertStocks(req, res) {
 }
 
 // function Headlines(data)
+
 //----------404 Error
 function routeNotFound(req, res) {
   res.status(404).send('Route NOT Be Found!');
