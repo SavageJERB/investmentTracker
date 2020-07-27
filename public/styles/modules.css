@@ -3,9 +3,9 @@ nav{
     border-radius: 0 60px 60px 0;
     float: left;
     height: auto;
-    margin: 100px 0 0 -17vw;
+    margin: 100px 0 0 0vw;
     overflow: hidden;
-    width: 160px;
+    width: 200px;
 }
 /*                                    <MAIN> of each page */
 main{

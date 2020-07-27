@@ -156,7 +156,7 @@ function search(req, res){
 
 
 function home(req, res){
-  res.status(200).render('pages/home', {title: 'Intellectual Investor', footer: 'About the Developers'});
+  res.status(200).render('pages/setting', {title: 'Intellectual Investor', footer: 'About the Developers'});
 }
 
 function getNewsData(data){

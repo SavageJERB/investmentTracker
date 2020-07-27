@@ -227,3 +227,32 @@ details > summary{
   background-color: blue;
   border-radius: 50px;
 } ------------------------------------------------------*/
+
+
+
+/* Look and effects of menu */
+
+
+.fa-4x, .fa-5x{
+  color: rgb(212, 205, 205);
+  background-color: rgb(78, 78, 80);
+  border-radius: 60%;
+  padding: 40px;
+}
+
+
+.fa-4x:hover, .fa-5x:hover{
+  color: rgb(78, 78, 80);
+  background-color: rgb(212, 205, 205);
+  animation: icon-glow 3s infinite;
+}
+
+.fa-4x:active, .fa-5x:hover:active{
+  border: 3px solid black;
+  animation: icon-glow 3s infinite;
+}
+
+@keyframes icon-glow {
+  50% {box-shadow: 0 0 30px blue;}
+}
+

@@ -13,3 +13,7 @@ nav, .settings, .criteria{
 button{
     background-color: rgba(33, 33, 243, 0.897);
 }
+
+nav{
+    background-color: rgb(170, 168, 168);
+}
