@@ -1,80 +1,36 @@
-
 <!DOCTYPE html>
 <html lang="en">
-
-
-<head>
-    <%- include('../layouts/head') %>
-</head>
-
-<body>
+    <head>
+        <%- include('../layouts/head') %>
+    </head>
     <header>
         <%- include('../layouts/header') %>
     </header>
-    <main class="criteria">
-        <div class="radio">
-            <!-- title="Only accepts Ticker Symbols (e.g., AAPL for Apple, Inc., MSFT for Microsoft Corp.)" -->
-            <i class="fas fa-info-circle"><span>Only accepts Ticker Symbols (e.g., AAPL for Apple, Inc., MSFT for
-                    Microsoft Corp.)</span></i></br>
-            <label for="parameters">Parameters</label>
-            <input type="radio" id="params" name="search">
-            <label for="tickerS">Ticker Symbol</label>
-            <input type="radio" id="tickerS" name="search" checked="checked">
-            <div class="searchParams">
-                <form class="form" method="post" action="/searches">
-                    <div>
-                        <select name="industry">
-                            <option>All Industries</option>
-                            <option value="IndustryA">IndustryA</option>
-                            <option value="IndustryB">IndustryB</option>
-                            <option value="IndustryC">IndustryC</option>
-                            <option value="IndustryD">IndustryD</option>
-                            <option value="IndustryE">IndustryE</option>
-                            <option value="IndustryF">IndustryF</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="price">Current buying price of stock:</label>
-                        </br>
-                        MAX<input type="number" value=10 name="price">MIN<input type="number" value=50 name="price">
-                    </div>
-                    <div>
-<<<<<<< Updated upstream
-                        <div>
-                            <input name="company" placeholder="Company Name"></input>
-                        </div>
+    <main id="sortable">
+        <section class="ui-state-default">
+            <div>
+                <details>
+                    <form method = "post" action = "/addStock">
 
-=======
-                        
->>>>>>> Stashed changes
-                        <div>
-                            <button type="submit" value="Submit">Search</button>
-                        </div>
-                    </div>
-                </form>
+                    
+                    <summary><h3> <%= output.companyName %> </br> Ticker: <%= output.symbol%></br>Current Price: <%= output.current_price %></h3></summary>
+                    <iframe src='https://wallmine.com/widgets/chart/<%=output.symbol%>' async frameborder='0' allowtransparency='true' scrolling='no' style='width: 100%; height: 450px'></iframe>
+                    <p> Sentiment Score: <%= output.sentimentResult %> <br> Industry: <%= output.sector %></p>
+                    
+                    <input type="hidden" name="companyName" value="<%= output.companyName %>">
+                    <input type="hidden" name="symbol" value="<%= output.symbol %>">
+                    <input type="hidden" name="current_price" value="<%= output.current_price %>">
+                    <input type="hidden" name="sentimentResult" value="<%= output.sentimentResult%>">
+                    <input type="hidden" name="sector" value="<%= output.sector %>">
+
+                    <button>Add to Watchlist</button> 
+                    </form>
+
+                </details>
             </div>
-            <div class="searchByTicker">
-
-                <form class="form" method="post" action="/searches">
-                    <div>
-                        <input name="ticker" placeholder="Ticker Symbol"></input>
-                    </div>
-<<<<<<< Updated upstream
-
-=======
-                    <!-- <div>
-                        <input name="company" placeholder="Company Name"></input>
-                    </div> -->
->>>>>>> Stashed changes
-                    <div>
-                        <button type="submit">Search</button>
-                    </div>
-                </form>
-            </div>
+        </section>
     </main>
     <footer>
         <%- include('../layouts/footer') %>
     </footer>
-</body>
-
 </html>
