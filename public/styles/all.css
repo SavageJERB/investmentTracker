@@ -207,6 +207,12 @@ nav{
   margin-bottom: 0;
   line-height: 100px;
   float: left;
+}:hover{
+  color: grey;
+}
+
+.header:hover{
+  color: white;
 }
 
 .fa-home{

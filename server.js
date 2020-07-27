@@ -25,6 +25,7 @@ app.get('/searches_housing', getHousingData)
 app.get('/sentiment', getSentimentData)
 app.get('/sqlone', insertStocks)
 app.get('/search', search)
+app.get('/pages/watch&result_Ex', connectionTest) //--Using for tests commentOut when working.
 
 
 //-----Error Routes
@@ -32,7 +33,7 @@ app.use('*', routeNotFound);
 app.use(bigError);
 //----------Connection Test Function
 function connectionTest(req, res){
-  res.status(200).render('pages/home')
+  res.status(200).render('pages/watch&result_Ex', {title: 'Your Watchlist', footer: 'About Us'})
 }
 let articlesArray = [];
 //----------Search API
@@ -156,7 +157,7 @@ function search(req, res){
 
 
 function home(req, res){
-  res.status(200).render('pages/setting', {title: 'Intellectual Investor', footer: 'About the Developers'});
+  res.status(200).render('pages/home', {title: 'Intellectual Investor', footer: 'About the Developers'});
 }
 
 function getNewsData(data){
