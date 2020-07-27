@@ -256,11 +256,11 @@ details > summary{
 
 .fa-4x:active, .fa-5x:hover:active{
   border: 3px solid black;
-  animation: icon-glow 3s infinite;
+  animation: icon-glow infinite;
 }
 
 @keyframes icon-glow {
-  50% {box-shadow: 0 0 30px blue;}
+  50% {box-shadow: inset 0 0 30px blue;}
 }
 
 .useInfo{
