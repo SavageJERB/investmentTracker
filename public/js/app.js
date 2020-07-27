@@ -28,7 +28,7 @@ $('.fa-bars').click('click', () => {
 
 $('main').click('click', () => {
     $('main').animate({marginLeft: '10%', opacity: 1}, 600);
-    $('nav').animate({marginLeft: '-17vw'}, 600);
+    $('nav').animate({marginLeft: '-30vw'}, 600);
     $('.header').animate({marginLeft: '5%'}, 600);
 })
 

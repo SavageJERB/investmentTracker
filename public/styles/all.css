@@ -127,13 +127,14 @@ main > section > div > iframe{
 
 .fa-info-circle{
   position: relative;
-  left: 100%;
+  top: 1vw;
+  left: 60vw;
   color: rgba(255, 255, 255, 0.432);
 }
 
 a{
   text-decoration: none;
-  color: white;
+  /* color: white; */
 }
 
 .fa-info-circle:hover{
@@ -256,3 +257,6 @@ details > summary{
   50% {box-shadow: 0 0 30px blue;}
 }
 
+.useInfo{
+  visibility: hidden;
+}
