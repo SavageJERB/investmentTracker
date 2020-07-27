@@ -148,7 +148,7 @@ function getStockData(req, res){
   })
   // }).catch(error => res.render('pages/error'));
 };
-///////////////////////////////////
+/////////////////////////////////
 
 function search(req, res){
   res.status(200).render('pages/search', {title: 'Search', footer: 'Home'});
@@ -156,7 +156,7 @@ function search(req, res){
 
 
 function home(req, res){
-  res.status(200).render('pages/watchlist_Ex', {title: 'Intellectual Investor', footer: 'About the Developers'});
+  res.status(200).render('pages/home', {title: 'Intellectual Investor', footer: 'About the Developers'});
 }
 
 function getNewsData(data){

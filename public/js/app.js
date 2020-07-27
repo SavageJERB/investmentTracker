@@ -20,7 +20,7 @@ $('#tickerS').click('click', () => {
 //----------Toggle Menu
 $('.fa-bars').click('click', () => {
     $('main').animate({marginLeft: '40%', opacity: 0.3}, 600);
-    $('.navigation').animate({marginLeft: '8vw'}, 600);
+    $('nav').animate({marginLeft: '0vw'}, 600);
     $('.header').animate({marginLeft: '10%'}, 600);
     // $('deatils').setAttr('open');
 })
@@ -28,8 +28,8 @@ $('.fa-bars').click('click', () => {
 
 $('main').click('click', () => {
     $('main').animate({marginLeft: '10%', opacity: 1}, 600);
-    $('.navigation').animate({marginLeft: '-19%'}, 600);
-    $('.header').animate({marginLeft: '2%'}, 600);
+    $('nav').animate({marginLeft: '-17vw'}, 600);
+    $('.header').animate({marginLeft: '5%'}, 600);
 })
 
 
