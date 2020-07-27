@@ -30,11 +30,6 @@ main{
   width: 80%;
 }
 
-details > summary::-webkit-details-marker {
-  display: none;
-  
-}
-
 
 .setting, .criteria{
   font-family: 'Ubuntu', sans-serif;
@@ -219,3 +214,15 @@ a{
 .fa-cog{
 margin-bottom: 5vh;
 }
+
+
+/* IF WE DONT LIKE THE ARROWS -------------------------------
+details > summary::-webkit-details-marker {
+  display: none;
+  
+}
+
+details > summary{
+  background-color: blue;
+  border-radius: 50px;
+} ------------------------------------------------------*/
