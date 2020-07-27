@@ -200,10 +200,8 @@ function buildWatchList(req,res){
       let dataBaseInfo = results.rows;
       console.log(dataBaseInfo);
       res.render('pages/watchlist', { output: dataBaseInfo, title: 'Your Watchlist', footer: 'Home'});
-    })
-    .catch(error => handleError(error, res));
+    }).catch(err => console.log(err));
 }
-
 
 
 function addStock(req,res){
