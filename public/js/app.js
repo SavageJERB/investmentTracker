@@ -17,7 +17,16 @@ $('#tickerS').click('click', () => {
     $('.searchParams').hide();
 })
 
-$('.clickNav').click(nav => {
-    $('.navigation').hide();
+//----------Toggle Menu
+$('.fa-bars').click('click', () => {
+    $('.navigation').animate({marginLeft: '8vw'}, 600);
+    $('.setting').animate({marginLeft: '40%'}, 600);
 })
+
+
+$('main').click('click', () => {
+    $('.navigation').animate({marginLeft: '-19%'}, 600);
+    $('.setting').animate({marginLeft: '10%'}, 600);
+})
+
 

@@ -2,37 +2,25 @@
 <html lang="en">
     <head>
         <title>Invest Savagely</title>
-<script src="https://kit.fontawesome.com/fc85feb03c.js" crossorigin="anonymous"></script>
-<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles/menu.css" />
-
+        <script src="https://kit.fontawesome.com/fc85feb03c.js" crossorigin="anonymous"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="/styles/menu.css" />
     </head>
-    <header>
-        <%- include('../layouts/header') %>
-    </header>
-    <button class="clickNav"><i class="fas fa-bars fa-6x"></i></button>
-
-        <div class="navigation"> 
-        <span class="menu_block">
-            <i class="fas fa-home fa-6x"></i>
-            <i class="fas fa-search-dollar fa-6x"></i>
-            <i class="fas fa-user-circle fa-6x"></i>
-            <i class="fas fa-cog fa-6x"></i>
-        </span>
-
-    </div>
+    <body>
 
 
 
-        <nav>      
-            <ul class="nav">       
-              <li><a href="#" class="icon-home"></a></li>
-              <li><a href="#" class="icon-cog"></a></li>
-              <li><a href="#" class="icon-cw"></a></li>
-              <li><a href="#" class="icon-location"></a></li>
-            </ul>
-          </nav>
-<footer>
-    <%- include('../layouts/footer') %>
-</footer>
+            <button class="button herFoo" disabled> <i class="fas fa-bars fa-1x"></i> <%= title %> </button>
+            <div class="navigation"> 
+                <a href="/search"><i class="fas fa-home fa-6x"></i></a>
+                <a href="/watchlist"><i class="fas fa-search-dollar fa-6x"></i></a>
+                <a href="/setting"><i class="fas fa-user-circle fa-6x"></i></a>
+                <i class="fas fa-cog fa-6x"></i>
+            </div>
+
+
+    <footer>
+        <%- include('../layouts/footer') %>
+    </footer>
+</body>
 </html>
