@@ -35,7 +35,7 @@ app.get('/search', search)
 app.get('/setting', settings)
 app.get('/developers', developers)
 
-app.get('/pages/watchlist', buildWatchList)
+app.get('/watchlist', buildWatchList)
 app.delete('/delete/:id',deleteStock);
 //-----Error Routes
 app.use('*', routeNotFound);
@@ -134,9 +134,9 @@ function getStockData(req, res){
       // console.log('housingData: ',housingData.listings);
     });
     getGreenData(data.body)
+    // console.log('======================', data.body)
     .then(greenData => {
       allInfo.greencheck = greenData.green
-
     });
     getNewsData(data.body)
     .then(newsData => {
@@ -246,8 +246,8 @@ function getGreenData(data){
   let newURL = url.replace('http://', '');
   // let newURL2 = url.replace("https://", "");
   // console.log('url :',newURL);
-  let API = `http://api.thegreenwebfoundation.org/greencheck/${newURL}`
-  return superagent.get(API)
+  let API = `http://api.thegreenwebfoundation.org/greencheck/${newURL}`;
+  return superagent.get(API);
 };
 
 function getHousingData(data){
