@@ -112,7 +112,7 @@ function getSentimentData(req, res){
 }
 
 function searchByParams(req, res){
-  let SQL = 'SELECT * FROM stock_info WHERE day_low > $1 AND day_high < $2';
+  let SQL = 'SELECT symbol FROM stock_info WHERE day_low > $1 AND day_high < $2 LIMIT 5';
   let params = [req.body.price[0], req.body.price[1]];
   
   client
