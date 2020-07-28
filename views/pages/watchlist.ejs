@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <%- include('../layouts/head') %>
+    </head>
+    <header>
+        <%- include('../layouts/header') %>
+    </header>
+    <main id="sortable">
+
+        <% output.forEach(object=>{ %>
+            <section class="ui-state-default">
+                <div>
+                    <details>
+                        <form method="post" action="/delete/<%=object.id%>?_method=delete" method="post">
+                                        
+                            <summary><h3> <%= object.companyName %> </br> Ticker: <%= object.symbol %> </br>Current Price: <%= object.current_price %> </h3></summary>
+                            <iframe src='https://wallmine.com/widgets/chart/<%=object.symbol%>' async frameborder='0' allowtransparency='true' scrolling='no' style='width: 100%; height: 450px'></iframe>
+                            <p> Sentiment Score: <%= object.sentimentresult %> <br> Industry: <%= object.sector %> </p>
+                            
+                            <input type="hidden" name="companyName" value="<%=object.companyName %>">
+                            <input type="hidden" name="symbol" value="<%=object.symbol %>">
+                            <input type="hidden" name="current_price" value="<%=object.current_price%>">
+                            <input type="hidden" name="sentimentResult" value="<%=object.sentimentresult%>">
+                            <input type="hidden" name="sector" value="<%=object.sector%>">
+
+                            <button>Remove from Watchlist</button> 
+                        </form>
+                    </details>
+                </div>
+            </section>
+        <% }) %>
+
+    </main>
+    <footer>
+        <%- include('../layouts/footer') %>
+    </footer>
+</html>

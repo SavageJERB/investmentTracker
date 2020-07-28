@@ -16,3 +16,21 @@ $('#tickerS').click('click', () => {
     $('.searchByTicker').show();
     $('.searchParams').hide();
 })
+
+//----------Toggle Menu
+$('.fa-bars').click('click', () => {
+    $('main').animate({marginLeft: '40%', opacity: 0.3}, 600);
+    $('nav').animate({marginLeft: '0vw'}, 600);
+    $('.header').animate({marginLeft: '10%'}, 600);
+    $('.fa-bars').css('color', 'grey');
+})
+
+
+$('main').click('click', () => {
+    $('main').animate({marginLeft: '10%', opacity: 1}, 600);
+    $('nav').animate({marginLeft: '-30vw'}, 600);
+    $('.header').animate({marginLeft: '5%'}, 600);
+    $('.fa-bars').css('color', 'white');
+})
+
+
