@@ -1,20 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-
-
-<head>
-    <%- include('../layouts/head') %>
-</head>
-
-<body>
+    <head>
+        <%- include('../layouts/head') %>
+    </head>
     <header>
         <%- include('../layouts/header') %>
     </header>
     <main class="criteria">
         <div class="radio">
             <!-- title="Only accepts Ticker Symbols (e.g., AAPL for Apple, Inc., MSFT for Microsoft Corp.)" -->
-            <i class="fas fa-info-circle"><span>Only accepts Ticker Symbols (e.g., AAPL for Apple, Inc., MSFT for
-                    Microsoft Corp.)</span></i></br>
+            <i class="fas fa-info-circle"><span class="useInfo">Only accepts Ticker Symbols (e.g., AAPL for Apple, Inc., MSFT for Microsoft Corp.)</span></i></br>
             <label for="parameters">Parameters</label>
             <input type="radio" id="params" name="search">
             <label for="tickerS">Ticker Symbol</label>
@@ -33,11 +28,11 @@
                         </select>
                     </div>
                     <div>
-                        <label for="price">Current buying price of stock:</label>
-                        </br>
+                        <label for="price">Current buying price of stock:</label></br>
                         MAX<input type="number" value=10 name="price">MIN<input type="number" value=50 name="price">
                     </div>
                     <div>
+
                         
                         <div>
                             <button type="submit" value="Submit">Search</button>
@@ -46,7 +41,6 @@
                 </form>
             </div>
             <div class="searchByTicker">
-
                 <form class="form" method="post" action="/searches">
                     <div>
                         <input name="ticker" placeholder="Ticker Symbol">
@@ -57,12 +51,11 @@
                         
                         <button type="submit">Search</button>
                     </div>
+
                 </form>
             </div>
     </main>
     <footer>
         <%- include('../layouts/footer') %>
     </footer>
-</body>
-
 </html>
