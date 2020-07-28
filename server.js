@@ -29,7 +29,7 @@ app.get('/searches', getStockData)//----we need an app.post
 app.get('/searches_green', getGreenData)
 app.get('/searches_housing', getHousingData)
 app.get('/sentiment', getSentimentData)
-app.get('/sqlone', insertStocks)
+app.get('/sql1', insertStocks)
 app.get('/search', search)
 app.get('/watchlist', buildWatchList)
 app.delete('/delete/:id',deleteStock);
@@ -301,7 +301,7 @@ function stockAPI(req, res) {
 
 // }
 } 
-console.log('stock info line 256: ', process.env.PORT);
+// console.log('stock info line 304: ', process.env.PORT);
 
 //----------Add Stock to Database
 function insertStocks(req, res) {
@@ -311,16 +311,16 @@ function insertStocks(req, res) {
   superagent
   .get(API)
   .then(apiData => {
-    let stockInfo = apiData[0];
+    let stockInfo = apiData.body;
 
-    console.log('stock info line 256: ', apiData);
-    const safeQuery = [stockInfo.name, stockInfo.ticker, stockInfo.dayHigh, stockInfo.dayLow, stockInfo.price];
-    const SQL = `
-      INSERT INTO stock_info (name, ticker, dayhigh, daylow, price) 
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING *;`;
-      client
-      .query(SQL, safeQuery)
+    console.log('////////////////// stock info line 316: ///////////////////////', stockInfo);
+    // const safeQuery = [stockInfo.name, stockInfo.ticker, stockInfo.dayHigh, stockInfo.dayLow, stockInfo.price];
+    // const SQL = `
+    //   INSERT INTO stock_info (name, ticker, dayhigh, daylow, price) 
+    //   VALUES ($1, $2, $3, $4, $5)
+    //   RETURNING *;`;
+    //   client
+    //   .query(SQL, safeQuery)
       // .then(results => {
       //   let dataBaseStock = results.rows;
       //   let show = '';
