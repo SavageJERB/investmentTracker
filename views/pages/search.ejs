@@ -10,12 +10,13 @@
         <div class="radio">
             <!-- title="Only accepts Ticker Symbols (e.g., AAPL for Apple, Inc., MSFT for Microsoft Corp.)" -->
             <i class="fas fa-info-circle"><span class="useInfo">Only accepts Ticker Symbols (e.g., AAPL for Apple, Inc., MSFT for Microsoft Corp.)</span></i></br>
-            <label for="parameters">Parameters</label>
-            <input type="radio" id="params" name="search">
             <label for="tickerS">Ticker Symbol</label>
             <input type="radio" id="tickerS" name="search" checked="checked">
+            <label for="parameters">Parameters</label>
+            <input type="radio" id="params" name="search">
+
             <div class="searchParams">
-                <form class="form" method="post" action="/searches">
+                <form class="form" method="post" action="/sql_search">
                     <div>
                         <select name="industry">
                             <option>All Industries</option>
@@ -29,7 +30,7 @@
                     </div>
                     <div>
                         <label for="price">Current buying price of stock:</label></br>
-                        MAX<input type="number" value=10 name="price">MIN<input type="number" value=50 name="price">
+                        MAX<input type="number" value=5 name="price">MIN<input type="number" value=10 name="price">
                     </div>
                     <div>
 
@@ -49,7 +50,7 @@
                     <div>
                         
                         
-                        <button type="submit">Search</button>
+                        <!-- <button type="submit">Search</button> -->
                     </div>
 
                 </form>

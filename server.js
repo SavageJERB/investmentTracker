@@ -23,19 +23,23 @@ app.use(express.static('./public'));
 app.use(methodOverride('_method'));
 app.use(express.static('./public'));
 
+// app.get ('') ???????
+
 //----------Routes
 app.get('/', home);
+app.get('/sql_view', viewSQL);
 app.post('/searches', getStockData)//----we need an app.post
+app.post('/sql_search', searchByParams);
 app.get('/searches_green', getGreenData)
 app.get('/searches_housing', getHousingData)
 app.get('/sentiment', getSentimentData)
 app.post('/addStock', addStock)
-app.get('/sqlone', insertStocks)
+app.get('/sql1', insertStocks)
 app.get('/search', search)
 app.get('/setting', settings)
 app.get('/developers', developers)
 
-app.get('/pages/watchlist', buildWatchList)
+app.get('/watchlist', buildWatchList)
 app.delete('/delete/:id',deleteStock);
 //-----Error Routes
 app.use('*', routeNotFound);
@@ -107,6 +111,19 @@ function getSentimentData(req, res){
   });
 }
 
+function searchByParams(req, res){
+  let SQL = 'SELECT * FROM stock_info WHERE day_low > $1 AND day_high < $2';
+  let params = [req.body.price[0], req.body.price[1]];
+  
+  client
+  .query(SQL, params)
+  .then(result => {
+    console.log(result.rows);
+    let matchStocks = result.rows;
+  })
+}
+
+
 //----------Stock Data API
 function getStockData(req, res){
   console.log(req.body.ticker)
@@ -134,9 +151,9 @@ function getStockData(req, res){
       // console.log('housingData: ',housingData.listings);
     });
     getGreenData(data.body)
+    // console.log('======================', data.body)
     .then(greenData => {
       allInfo.greencheck = greenData.green
-
     });
     getNewsData(data.body)
     .then(newsData => {
@@ -246,8 +263,8 @@ function getGreenData(data){
   let newURL = url.replace('http://', '');
   // let newURL2 = url.replace("https://", "");
   // console.log('url :',newURL);
-  let API = `http://api.thegreenwebfoundation.org/greencheck/${newURL}`
-  return superagent.get(API)
+  let API = `http://api.thegreenwebfoundation.org/greencheck/${newURL}`;
+  return superagent.get(API);
 };
 
 function getHousingData(data){
@@ -287,8 +304,6 @@ function getSentimentData(data){
   });
 }
 
-app.get ('')
-
 //----------Stock info Constructor
 function StockDetails(data){
   this.symbol = typeof(data.symbol) !== 'undefined' ?  (data.symbol) : ""
@@ -299,51 +314,48 @@ function StockDetails(data){
   this.current_price = typeof(data.price) !=='undefined' ? data.price : ""
 }
 
-
-
-function stockAPI(req, res) {
-  let API = 'https://financialmodelingprep.com/api/v3/profile/msft';
-  let queryKey = {
-    apikey: process.env.STOCK_API
-  }
-
-  // superagent
-  // .get(API)
-  // .query(queryKey)
-  // .then(data =>{
-
-// }
-} 
-console.log('stock info line 256: ', process.env.PORT);
-
 //----------Add Stock to Database
 function insertStocks(req, res) {
-  
+  console.log('////////////////////////Proof of life line 324: ////////////////////////', process.env.PORT);
   let API = `https://financialmodelingprep.com/api/v3/quotes/nyse?apikey=${process.env.STOCK_API}`;
   
   superagent
   .get(API)
   .then(apiData => {
-    let stockInfo = apiData[0];
+    console.log('////////////////////////Proof of life line 328: ////////////////////////', process.env.PORT);
+    let stockInfo = apiData.body;
+    console.log('////////////////////////stock info line 329: ////////////////////////');
 
-    console.log('stock info line 256: ', apiData);
-    const safeQuery = [stockInfo.name, stockInfo.ticker, stockInfo.dayHigh, stockInfo.dayLow, stockInfo.price];
-    const SQL = `
-      INSERT INTO stock_info (name, ticker, dayhigh, daylow, price) 
+    stockInfo.forEach( rawData => {
+      // console.log("Data In: ", rawData);
+      const SQL = `
+      INSERT INTO stock_info (companyname, symbol, current_price, day_low, day_high) 
       VALUES ($1, $2, $3, $4, $5)
-      RETURNING *;`;
-      client
-      .query(SQL, safeQuery)
-      // .then(results => {
-      //   let dataBaseStock = results.rows;
-      //   let show = '';
-        
-      //   res.render('pages/books/show', { data: dataBaseStock, pgName: 'Details Page', home: show, searchNew: show});
-      // })
-    })
+      RETURNING * ;`;
+      const safeQuery = [rawData.name, rawData.symbol, rawData.price, rawData.dayLow, rawData.dayHigh];
+        client
+        .query(SQL, safeQuery)
+
+    });
+
+  })
     
-    // .catch(error => handleError(error, res));
 }
+
+//----------Puts all Stocks in Database Table
+function viewSQL(req, res){
+  const SQL = `Select * from stock_info;`;
+
+  client
+  .query(SQL)
+  .then((data) => {
+    res.send(data.rows);
+
+  }).catch(error => console.log(error));
+
+}
+
+
 
 // function Headlines(data)
 
