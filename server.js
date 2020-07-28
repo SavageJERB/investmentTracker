@@ -25,13 +25,17 @@ app.use(express.static('./public'));
 
 //----------Routes
 app.get('/', home);
-app.get('/searches', getStockData)//----we need an app.post
+app.post('/searches', getStockData)//----we need an app.post
 app.get('/searches_green', getGreenData)
 app.get('/searches_housing', getHousingData)
 app.get('/sentiment', getSentimentData)
+app.post('/addStock', addStock)
 app.get('/sqlone', insertStocks)
 app.get('/search', search)
-app.get('/watchlist', buildWatchList)
+app.get('/setting', settings)
+app.get('/developers', developers)
+
+app.get('/pages/watchlist', buildWatchList)
 app.delete('/delete/:id',deleteStock);
 //-----Error Routes
 app.use('*', routeNotFound);
@@ -42,6 +46,13 @@ function connectionTest(req, res){
   res.status(200).render('pages/home')
 }
 
+function developers(req,res){
+  res.status(200).render('pages/developers', {title: 'About the Developers', footer: 'Home'});
+}
+
+function settings(req,res){
+  res.status(200).render('pages/setting', {title: 'Settings', footer: 'Home'});
+}
 
 //----------Delete Stock from Watchlist
 function deleteStock(req,res) {
@@ -98,7 +109,8 @@ function getSentimentData(req, res){
 
 //----------Stock Data API
 function getStockData(req, res){
-  let API = 'https://financialmodelingprep.com/api/v3/profile/msft';
+  console.log(req.body.ticker)
+  let API = `https://financialmodelingprep.com/api/v3/profile/${req.body.ticker}`;
   let queryKey = {
     apikey: process.env.STOCK_API
   }
@@ -137,8 +149,9 @@ function getStockData(req, res){
        documents.push({id: i, language: "en", text: articlesArray[i]})
       }
       let output = {documents:documents} // creates object needed for Sentiment API
-      getSentimentData(output)      
+      getSentimentData(output)   
       .then(sentimentResults=>{
+        
         let sentimentArray = []
         
         sentimentResults.documents.forEach(object=>{
@@ -153,6 +166,7 @@ function getStockData(req, res){
             return value = 2;
           }
         })
+        
         let sentimentSum = sentimentNumbersArray.reduce((previous,current) => current += previous);
         let sentimentAvgScore = Math.round(sentimentSum / sentimentNumbersArray.length);
         let sentimentResult = 'N/A'
@@ -163,7 +177,7 @@ function getStockData(req, res){
         }else if(sentimentAvgScore == 2){
           sentimentResult = "Positive"
         }
-        allInfo.sentimentScore = sentimentResult;
+        allInfo.sentimentResult = sentimentResult;
 
       })
       .then(response=> res.render('pages/results', {output: allInfo, title: 'Search Results', footer: 'Home'}))
@@ -207,10 +221,10 @@ function addStock(req,res){
   .then(result =>{
     let finalOutput = result.rows[0]
     console.log(finalOutput)
-    res.render('/watchlist', {output:finalOutput, title: 'Your Watchlist', footer: 'Home'} )
+    res.render('/pages/watchlist', {output:finalOutput, title: 'Your Watchlist', footer: 'Home'} )
   })
   .catch(()=>{
-    res.redirect('/watchlist')
+    res.redirect('/pages/watchlist')
   })
 };
 //----------News, Green, Housing, and Sentiment APIs Below
@@ -228,7 +242,6 @@ function getNewsData(data){
 };
 
 function getGreenData(data){
-  // let url = 'http://www.microsoft.com';
   let url = data[0].website;
   let newURL = url.replace('http://', '');
   // let newURL2 = url.replace("https://", "");
