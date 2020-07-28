@@ -34,8 +34,9 @@ app.get('/sqlone', insertStocks)
 app.get('/search', search)
 app.get('/setting', settings)
 app.get('/developers', developers)
+app.post('/selectedSettings', setSettings)
 
-app.get('/pages/watchlist', buildWatchList)
+app.get('/watchlist', buildWatchList)
 app.delete('/delete/:id',deleteStock);
 //-----Error Routes
 app.use('*', routeNotFound);
@@ -54,21 +55,35 @@ function settings(req,res){
   res.status(200).render('pages/setting', {title: 'Settings', footer: 'Home'});
 }
 
+//----------Global Variables
+let articlesArray = [];
+let appSettings = {news:5, housing_price:5, violations:5, sustainability: 5}
+let allInfo = ""
+
+
+
+//----------Set Setting to calculate the Stock Score
+function setSettings(req,res){
+  appSettings = req.body
+  console.log(appSettings)
+  // let rawStockScore = ((appSettings.news)*(allInfo.sentimentRawAvg)+(appSettings.house_prices)*(allInfo.housingScore))/(appSettings.news+appSettings.house_prices)
+  // allInfo.stockScore = rawStockScore*10
+}
+
+
+
 //----------Delete Stock from Watchlist
 function deleteStock(req,res) {
   
   let SQL = 'DELETE from investment_info WHERE id=$1;';
   let param = [req.params.id]
-  console.log(param)
+  // console.log(param)
 
   client.query(SQL, param)
     .then(()=>{
       res.redirect('/')
     }).catch(error => console.log(error));
 }
-
-
-let articlesArray = [];
 
 //----------Search Sentiment API
 function getSentimentData(req, res){
@@ -120,18 +135,21 @@ function getStockData(req, res){
     // console.log(data.body);
     let details = data.body.map(object => new StockDetails(object));
 
-    let allInfo = details[0];
+    allInfo = details[0];
     getHousingData(data.body)
     .then(housingData => {
       let priceArray = [];
+      let final_price =0;
 
       housingData.listings.forEach(object=>{
-        priceArray.push(object.price)
+    
+        final_price = Number(object.price.replace(/[^0-9\.-]+/g,""))
+        
+        priceArray.push(final_price)
       })
-      // let housingUpdate = details;
-      allInfo.listings = priceArray
-      // housingUpdate.listings = priceArray;
-      // console.log('housingData: ',housingData.listings);
+      console.log(priceArray)
+      avgHousingPrice(priceArray)
+
     });
     getGreenData(data.body)
     .then(greenData => {
@@ -149,11 +167,13 @@ function getStockData(req, res){
        documents.push({id: i, language: "en", text: articlesArray[i]})
       }
       let output = {documents:documents} // creates object needed for Sentiment API
+      
       getSentimentData(output)   
       .then(sentimentResults=>{
         
         let sentimentArray = []
-        
+        // console.log(sentimentResults)
+        // console.log(sentimentResults.documents)
         sentimentResults.documents.forEach(object=>{
             sentimentArray.push(object.sentiment)
         })
@@ -168,6 +188,7 @@ function getStockData(req, res){
         })
         
         let sentimentSum = sentimentNumbersArray.reduce((previous,current) => current += previous);
+        allInfo.sentimentRawAvg = sentimentSum / sentimentNumbersArray.length
         let sentimentAvgScore = Math.round(sentimentSum / sentimentNumbersArray.length);
         let sentimentResult = 'N/A'
         if(sentimentAvgScore == 0){
@@ -178,7 +199,14 @@ function getStockData(req, res){
           sentimentResult = "Positive"
         }
         allInfo.sentimentResult = sentimentResult;
-
+        let rawStockScore = ((appSettings.news)*(allInfo.sentimentRawAvg)+(appSettings.housing_price)*(allInfo.housingScore))/(appSettings.news*2+appSettings.housing_price*2)
+        allInfo.stockScore = rawStockScore*10
+        console.log(appSettings)
+        console.log(allInfo.sentimentRawAvg)
+        console.log(allInfo.housingScore)
+        console.log(rawStockScore)
+        console.log(allInfo)
+        
       })
       .then(response=> res.render('pages/results', {output: allInfo, title: 'Search Results', footer: 'Home'}))
     })
@@ -187,6 +215,24 @@ function getStockData(req, res){
   // }).catch(error => res.render('pages/error'));
 };
 
+
+function avgHousingPrice(data){
+  
+  let sum = data.reduce((previous,current) => current += previous);
+  console.log(sum)
+  allInfo.avgHousePrice = sum/data.length;
+  let score = 0;
+  if (allInfo.avgHousePrice <= 155000){
+    score = (1-(155000- (allInfo.avgHousePrice))/155000)*1 //yields a result btw 0 and 1, where is 1 is middle value
+    allInfo.housingScore = score
+  }else if (allInfo.avgHousePrice>300000){
+    allInfo.housingScore = 2
+  }else{
+    score = 1+((allInfo.avgHousePrice-155000)/145000)
+    allInfo.housingScore = score
+  }
+
+}
 //----------Search for Stocks Page
 function search(req, res){
   res.status(200).render('pages/search', {title: 'Search', footer: 'Home'});
@@ -204,7 +250,7 @@ function buildWatchList(req,res){
   client.query(SQL)
     .then(results => {
       let dataBaseInfo = results.rows;
-      console.log(dataBaseInfo);
+      // console.log(dataBaseInfo);
       res.render('pages/watchlist', { output: dataBaseInfo, title: 'Your Watchlist', footer: 'Home'});
     }).catch(err => console.log(err));
 }
@@ -214,17 +260,17 @@ function addStock(req,res){
 
   const SQL = 'INSERT INTO investment_info (companyName, symbol, sentimentResult, sector,current_price) VALUES ($1, $2, $3,$4,$5) RETURNING *';
   let userInput = req.body
-  console.log(req.body)
+  // console.log(req.body)
   const param = [userInput.companyName,userInput.symbol,userInput.sentimentResult,userInput.sector,userInput.current_price]
   
   client.query(SQL, param) // information being stored in database
   .then(result =>{
     let finalOutput = result.rows[0]
-    console.log(finalOutput)
-    res.render('/pages/watchlist', {output:finalOutput, title: 'Your Watchlist', footer: 'Home'} )
+    // console.log(finalOutput)
+    res.render('/watchlist', {output:finalOutput, title: 'Your Watchlist', footer: 'Home'} )
   })
   .catch(()=>{
-    res.redirect('/pages/watchlist')
+    res.redirect('/watchlist')
   })
 };
 //----------News, Green, Housing, and Sentiment APIs Below
@@ -298,6 +344,14 @@ function StockDetails(data){
   this.zip = typeof(data.zip) !=='undefined' ? data.zip : ""
   this.current_price = typeof(data.price) !=='undefined' ? data.price : ""
 }
+
+// //App Settings Constructor
+// function Scores(data){
+//   this.newsScore = data.news
+//   this.housingScore = data.housing_price
+//   this.violations = data.violations
+//   this.sustainability = data.sustainability
+// }
 
 
 

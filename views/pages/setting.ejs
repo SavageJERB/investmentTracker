@@ -8,23 +8,25 @@
     </header>
         <main class="settings">
             <h3>Factors:</h3>
-            <form action="">
+            <form method = "post" action="/selectedSettings">
                 <div>
                     <label for="news">Importance of News Sentiments.</label></br>
-                    <input type="range" id="news" name="news" min="0" max="10">
+                    <input type="range" id="news" name="news" min="0" max="10" value = "news">
                 </div>
                 <div>
                     <label for="housing">Importance of Housing Market Trands located within __??__miles of companies head quarters.</label></br>
-                    <input type="range" id="housing" name="housing" min="0" max="10">
+                    <input type="range" id="housing" name="housing" min="0" max="10" value = "housing_price">
                 </div>
                 <div>
                     <label for="violations">Importance of human rights violations.</label></br>
-                    <input type="range" id="violations" name="violations" min="0" max="10">
+                    <input type="range" id="violations" name="violations" min="0" max="10" value = "violations">
                 </div>
                 <div>
                     <label for="sustainability">Importance of sustainability regarding searched companies.</label></br>
-                    <input type="range" id="sustainability" name="sustainability" min="0" max="10">
+                    <input type="range" id="sustainability" name="sustainability" min="0" max="10" value = "sustainability">
                 </div>
+
+                <button>Save Settings</button> 
             </form>
         </main>
     <footer>
