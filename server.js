@@ -127,7 +127,7 @@ function getSentimentData(req, res){
 }
 
 function searchByParams(req, res){
-  let SQL = 'SELECT symbol FROM stock_info WHERE day_low > $1 AND day_high < $2 LIMIT 5';
+  let SQL = 'SELECT symbol, companyname FROM stock_info WHERE day_low > $1 AND day_high < $2 LIMIT 5';
   let params = [req.body.price[0], req.body.price[1]];
   
   client
@@ -135,14 +135,15 @@ function searchByParams(req, res){
   .then(result => {
     console.log(result.rows);
     let matchStocks = result.rows;
+    res.render('/pages/pricematch', {output:result.rows})
   })
 }
 
 
 //----------Stock Data API
 function getStockData(req, res){
-  console.log(req.body.ticker)
-  let API = `https://financialmodelingprep.com/api/v3/profile/${req.body.ticker}`;
+  console.log(req.body.symbol)
+  let API = `https://financialmodelingprep.com/api/v3/profile/${req.body.symbol}`;
   let queryKey = {
     apikey: process.env.STOCK_API
   }
