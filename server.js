@@ -30,7 +30,7 @@ app.get('/searches_green', getGreenData)
 app.get('/searches_housing', getHousingData)
 app.get('/sentiment', getSentimentData)
 app.post('/addStock', addStock)
-app.get('/sqlone', insertStocks)
+app.get('/sql1', insertStocks)
 app.get('/search', search)
 app.get('/setting', settings)
 app.get('/developers', developers)
@@ -314,32 +314,41 @@ function stockAPI(req, res) {
 
 // }
 } 
-console.log('stock info line 256: ', process.env.PORT);
+console.log('////////////////////////Proof of life line 317: ////////////////////////', process.env.PORT);
 
 //----------Add Stock to Database
 function insertStocks(req, res) {
-  
+  console.log('////////////////////////Proof of life line 324: ////////////////////////', process.env.PORT);
   let API = `https://financialmodelingprep.com/api/v3/quotes/nyse?apikey=${process.env.STOCK_API}`;
   
   superagent
   .get(API)
   .then(apiData => {
-    let stockInfo = apiData[0];
+    console.log('////////////////////////Proof of life line 328: ////////////////////////', process.env.PORT);
+    let stockInfo = apiData.body;
+    console.log('////////////////////////stock info line 329: ////////////////////////');
 
-    console.log('stock info line 256: ', apiData);
-    const safeQuery = [stockInfo.name, stockInfo.ticker, stockInfo.dayHigh, stockInfo.dayLow, stockInfo.price];
-    const SQL = `
-      INSERT INTO stock_info (name, ticker, dayhigh, daylow, price) 
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING *;`;
-      client
-      .query(SQL, safeQuery)
-      // .then(results => {
-      //   let dataBaseStock = results.rows;
-      //   let show = '';
-        
-      //   res.render('pages/books/show', { data: dataBaseStock, pgName: 'Details Page', home: show, searchNew: show});
-      // })
+    stockInfo.forEach( rawData => {
+      console.log("Data In: ", rawData);
+      // const SQL = `
+      // INSERT INTO stock_info (companyname, symbol, current_price, daylow, dayhigh) 
+      // VALUES ($1, $2, $3, $4, $5)
+      // RETURNING * ;`;
+      // // const safeQuery = [rawData.name, rawData.symbol, rawData.price, rawData.dayLow, rawData.dayHigh];
+      // const safeQuery = ['rawData.name', 'rawData.symbol', 'rawData.price', 'rawData.dayLow', 'rawData.dayHigh'];
+      //   client
+      //   .query(SQL, safeQuery)
+      //   // .then(results => {
+      //   //   let dataBaseStock = results.rows;
+      //   //   let show = '';
+          
+      //   //   res.render('pages/books/show', { data: dataBaseStock, pgName: 'Details Page', home: show, searchNew: show});
+      //   // })
+      //   .then(console.log("//////////////////Sql Load Complete////////////////////"))
+    });
+
+
+
     })
     
     // .catch(error => handleError(error, res));
