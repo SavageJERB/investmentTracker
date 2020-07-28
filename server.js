@@ -329,22 +329,22 @@ function insertStocks(req, res) {
     console.log('////////////////////////stock info line 329: ////////////////////////');
 
     stockInfo.forEach( rawData => {
-      console.log("Data In: ", rawData);
-      // const SQL = `
-      // INSERT INTO stock_info (companyname, symbol, current_price, daylow, dayhigh) 
-      // VALUES ($1, $2, $3, $4, $5)
-      // RETURNING * ;`;
-      // // const safeQuery = [rawData.name, rawData.symbol, rawData.price, rawData.dayLow, rawData.dayHigh];
+      // console.log("Data In: ", rawData);
+      const SQL = `
+      INSERT INTO stock_info (companyname, symbol, current_price, day_low, day_high) 
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING * ;`;
+      const safeQuery = [rawData.name, rawData.symbol, rawData.price, rawData.dayLow, rawData.dayHigh];
       // const safeQuery = ['rawData.name', 'rawData.symbol', 'rawData.price', 'rawData.dayLow', 'rawData.dayHigh'];
-      //   client
-      //   .query(SQL, safeQuery)
-      //   // .then(results => {
-      //   //   let dataBaseStock = results.rows;
-      //   //   let show = '';
+        client
+        .query(SQL, safeQuery)
+        // .then(results => {
+        //   let dataBaseStock = results.rows;
+        //   let show = '';
           
-      //   //   res.render('pages/books/show', { data: dataBaseStock, pgName: 'Details Page', home: show, searchNew: show});
-      //   // })
-      //   .then(console.log("//////////////////Sql Load Complete////////////////////"))
+        //   res.render('pages/books/show', { data: dataBaseStock, pgName: 'Details Page', home: show, searchNew: show});
+        // })
+        .then(console.log("//////////////////Sql Load Complete////////////////////"))
     });
 
 
