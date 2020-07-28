@@ -141,8 +141,8 @@ function searchByParams(req, res){
 
 //----------Stock Data API
 function getStockData(req, res){
-  console.log(req.body.ticker)
-  let API = `https://financialmodelingprep.com/api/v3/profile/${req.body.ticker}`;
+  console.log(req.body.symbol)
+  let API = `https://financialmodelingprep.com/api/v3/profile/${req.body.symbol}`;
   let queryKey = {
     apikey: process.env.STOCK_API
   }
