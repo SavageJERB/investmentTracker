@@ -29,6 +29,7 @@ app.use(express.static('./public'));
 app.get('/', home);
 app.get('/sql_view', viewSQL);
 app.post('/searches', getStockData)//----we need an app.post
+app.post('/sql_search', searchByParams);
 app.get('/searches_green', getGreenData)
 app.get('/searches_housing', getHousingData)
 app.get('/sentiment', getSentimentData)
@@ -109,6 +110,19 @@ function getSentimentData(req, res){
     console.log(err);
   });
 }
+
+function searchByParams(req, res){
+  let SQL = 'SELECT * FROM stock_info WHERE day_low > $1 AND day_high < $2';
+  let params = [req.body.price[0], req.body.price[1]];
+  
+  client
+  .query(SQL, params)
+  .then(result => {
+    console.log(result.rows);
+    let matchStocks = result.rows;
+  })
+}
+
 
 //----------Stock Data API
 function getStockData(req, res){
