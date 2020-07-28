@@ -23,8 +23,11 @@ app.use(express.static('./public'));
 app.use(methodOverride('_method'));
 app.use(express.static('./public'));
 
+// app.get ('') ???????
+
 //----------Routes
 app.get('/', home);
+app.get('/sql_view', viewSQL);
 app.post('/searches', getStockData)//----we need an app.post
 app.get('/searches_green', getGreenData)
 app.get('/searches_housing', getHousingData)
@@ -287,8 +290,6 @@ function getSentimentData(data){
   });
 }
 
-app.get ('')
-
 //----------Stock info Constructor
 function StockDetails(data){
   this.symbol = typeof(data.symbol) !== 'undefined' ?  (data.symbol) : ""
@@ -298,23 +299,6 @@ function StockDetails(data){
   this.zip = typeof(data.zip) !=='undefined' ? data.zip : ""
   this.current_price = typeof(data.price) !=='undefined' ? data.price : ""
 }
-
-
-
-function stockAPI(req, res) {
-  let API = 'https://financialmodelingprep.com/api/v3/profile/msft';
-  let queryKey = {
-    apikey: process.env.STOCK_API
-  }
-
-  // superagent
-  // .get(API)
-  // .query(queryKey)
-  // .then(data =>{
-
-// }
-} 
-console.log('////////////////////////Proof of life line 317: ////////////////////////', process.env.PORT);
 
 //----------Add Stock to Database
 function insertStocks(req, res) {
@@ -335,24 +319,29 @@ function insertStocks(req, res) {
       VALUES ($1, $2, $3, $4, $5)
       RETURNING * ;`;
       const safeQuery = [rawData.name, rawData.symbol, rawData.price, rawData.dayLow, rawData.dayHigh];
-      // const safeQuery = ['rawData.name', 'rawData.symbol', 'rawData.price', 'rawData.dayLow', 'rawData.dayHigh'];
         client
         .query(SQL, safeQuery)
-        // .then(results => {
-        //   let dataBaseStock = results.rows;
-        //   let show = '';
-          
-        //   res.render('pages/books/show', { data: dataBaseStock, pgName: 'Details Page', home: show, searchNew: show});
-        // })
-        .then(console.log("//////////////////Sql Load Complete////////////////////"))
+
     });
 
-
-
-    })
+  })
     
-    // .catch(error => handleError(error, res));
 }
+
+//----------Puts all Stocks in Database Table
+function viewSQL(req, res){
+  const SQL = `Select * from stock_info;`;
+
+  client
+  .query(SQL)
+  .then((data) => {
+    res.send(data.rows);
+
+  }).catch(error => console.log(error));
+
+}
+
+
 
 // function Headlines(data)
 
