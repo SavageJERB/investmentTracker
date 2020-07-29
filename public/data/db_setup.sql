@@ -18,7 +18,8 @@ CREATE TABLE stock_info (
     symbol VARCHAR(20),
     current_price DECIMAL(8,2),
     day_low DECIMAL(8,2),
-    day_high DECIMAL(8,2)
+    day_high DECIMAL(8,2),
+    UNIQUE(symbol)
 );
 
 INSERT INTO investment_info (companyName, symbol, current_price,sentimentResult, sector) VALUES ('Wang Corp', 'WAN', '1000', 'Positive', 'Technology') RETURNING *;
