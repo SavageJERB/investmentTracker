@@ -30,17 +30,17 @@ app.get('/', home);
 app.get('/sql_view', viewSQL);
 app.post('/searches', getStockData)//----we need an app.post
 app.post('/sql_search', searchByParams);
-app.get('/searches_green', getGreenData)
-app.get('/searches_housing', getHousingData)
-app.get('/sentiment', getSentimentData)
-app.post('/addStock', addStock)
-app.get('/sql1', insertStocks)
-app.get('/search', search)
-app.get('/setting', settings)
-app.get('/developers', developers)
-app.post('/selectedSettings', setSettings)
+app.get('/searches_green', getGreenData);
+app.get('/searches_housing', getHousingData);
+app.get('/sentiment', getSentimentData);
+app.post('/addStock', addStock);
+app.get('/sql1', insertStocks);
+app.get('/search', search);
+app.get('/setting', settings);
+app.get('/developers', developers);
+app.post('/selectedSettings', setSettings);
 
-app.get('/watchlist', buildWatchList)
+app.get('/watchlist', buildWatchList);
 app.delete('/delete/:id',deleteStock);
 //-----Error Routes
 app.use('*', routeNotFound);
@@ -128,14 +128,14 @@ function getSentimentData(req, res){
 
 function searchByParams(req, res){
   let SQL = 'SELECT symbol, companyname FROM stock_info WHERE day_low > $1 AND day_high < $2 LIMIT 5';
-  console.log(req.body)
+  console.log(req.body);
   let params = [req.body.price[0], req.body.price[1]];
   
   client
   .query(SQL, params)
   .then(result => {
     let matchStocks = result.rows;
-    console.log(matchStocks)
+    console.log(matchStocks);
     res.render('pages/pricematch', {output:matchStocks, title: "Search Results", footer: "Home"})
   })
 }
@@ -150,11 +150,12 @@ function getStockData(req, res){
   }
   superagent.get(API).query(queryKey)
   .then(data =>{
-
+    
     // console.log(data.body);
     let details = data.body.map(object => new StockDetails(object));
 
     allInfo = details[0];
+    allInfo.housingScore = 0;
     getHousingData(data.body)
     .then(housingData => {
       let priceArray = [];
@@ -174,6 +175,8 @@ function getStockData(req, res){
     // console.log('======================', data.body)
     .then(greenData => {
       allInfo.greencheck = greenData.green
+      console.log(greenData)
+      // allInfo.greencheck = allInfo.greencheck || "Unknown"
     });
     getNewsData(data.body)
     .then(newsData => {
@@ -236,19 +239,22 @@ function getStockData(req, res){
 
 
 function avgHousingPrice(data){
-  
+
   let sum = data.reduce((previous,current) => current += previous);
   console.log(sum)
   allInfo.avgHousePrice = sum/data.length;
+  allInfo.avgHousePrice = allInfo.avgHousePrice || 0;
   let score = 0;
   if (allInfo.avgHousePrice <= 155000){
     score = (1-(155000- (allInfo.avgHousePrice))/155000)*1 //yields a result btw 0 and 1, where is 1 is middle value
-    allInfo.housingScore = score
+    allInfo.housingScore = score;
   }else if (allInfo.avgHousePrice>300000){
-    allInfo.housingScore = 2
-  }else{
+    allInfo.housingScore = 2;
+  }else if (allInfo.avgHousePrice >155000){
     score = 1+((allInfo.avgHousePrice-155000)/145000)
-    allInfo.housingScore = score
+    allInfo.housingScore = score;
+  }else{
+    allInfo.housingScore = 0;
   }
 
 }
@@ -282,17 +288,21 @@ function addStock(req,res){
   let userInput = req.body
   // console.log(req.body)
   const param = [userInput.companyName,userInput.symbol,userInput.sentimentResult,userInput.sector,userInput.current_price]
+
+  let SQL1 = `SELECT * FROM investment_info`;
   
   client.query(SQL, param) // information being stored in database
-  .then(result =>{
-    let finalOutput = result.rows[0]
-    // console.log(finalOutput)
-    res.render('/watchlist', {output:finalOutput, title: 'Your Watchlist', footer: 'Home'} )
-  })
+  client.query(SQL1) // Go
+  .then(results => {
+    res.redirect('/watchlist')
+
   .catch(()=>{
     res.redirect('/watchlist')
+  });
+
   })
-};
+
+}
 //----------News, Green, Housing, and Sentiment APIs Below
 function getNewsData(data){
   let tickerSymbol = data[0].symbol;
@@ -309,10 +319,12 @@ function getNewsData(data){
 
 function getGreenData(data){
   let url = data[0].website;
+  console.log(url)
   let newURL = url.replace('http://', '');
   // let newURL2 = url.replace("https://", "");
   // console.log('url :',newURL);
   let API = `http://api.thegreenwebfoundation.org/greencheck/${newURL}`;
+  console.log(API);
   return superagent.get(API);
 };
 
