@@ -89,7 +89,7 @@ main > section {
   font-weight: 450;
   color: white;
   background-color: rgb(52, 52, 238);
-  line-height: 60px;
+  line-height: 40px;
   border-radius: 60px;
   margin-bottom: 150px;
   height: auto;
@@ -266,3 +266,9 @@ details > summary{
 .useInfo{
   visibility: hidden;
 }
+
+
+watchlist{
+  line-height: 0;
+}
+
