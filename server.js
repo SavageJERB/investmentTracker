@@ -128,6 +128,7 @@ function getSentimentData(req, res){
 
 function searchByParams(req, res){
   let SQL = 'SELECT symbol, companyname FROM stock_info WHERE day_low > $1 AND day_high < $2 LIMIT 5';
+  console.log(req.body)
   let params = [req.body.price[0], req.body.price[1]];
   
   client
@@ -135,7 +136,10 @@ function searchByParams(req, res){
   .then(result => {
     console.log(result.rows);
     let matchStocks = result.rows;
-    res.render('/pages/pricematch', {output:result.rows})
+    console.log(matchStocks)
+    let dummydata = [{companyname: "ABC", symbol: "abc"},{companyname: "XYZ", symbol: "xyz"}]
+
+    res.render('/pages/pricematch', {output:dummydata})
   })
 }
 
@@ -269,6 +273,7 @@ function buildWatchList(req,res){
     .then(results => {
       let dataBaseInfo = results.rows;
       // console.log(dataBaseInfo);
+      console.log(results.rows)
       res.render('pages/watchlist', { output: dataBaseInfo, title: 'Your Watchlist', footer: 'Home'});
     }).catch(err => console.log(err));
 }
