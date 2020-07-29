@@ -150,11 +150,12 @@ function getStockData(req, res){
   }
   superagent.get(API).query(queryKey)
   .then(data =>{
-
+    
     // console.log(data.body);
     let details = data.body.map(object => new StockDetails(object));
 
     allInfo = details[0];
+    allInfo.housingScore = 0;
     getHousingData(data.body)
     .then(housingData => {
       let priceArray = [];
@@ -236,19 +237,22 @@ function getStockData(req, res){
 
 
 function avgHousingPrice(data){
-  
+
   let sum = data.reduce((previous,current) => current += previous);
   console.log(sum)
   allInfo.avgHousePrice = sum/data.length;
+  allInfo.avgHousePrice = allInfo.avgHousePrice || 0;
   let score = 0;
   if (allInfo.avgHousePrice <= 155000){
     score = (1-(155000- (allInfo.avgHousePrice))/155000)*1 //yields a result btw 0 and 1, where is 1 is middle value
-    allInfo.housingScore = score
+    allInfo.housingScore = score;
   }else if (allInfo.avgHousePrice>300000){
-    allInfo.housingScore = 2
-  }else{
+    allInfo.housingScore = 2;
+  }else if (allInfo.avgHousePrice >155000){
     score = 1+((allInfo.avgHousePrice-155000)/145000)
-    allInfo.housingScore = score
+    allInfo.housingScore = score;
+  }else{
+    allInfo.housingScore = 0;
   }
 
 }
