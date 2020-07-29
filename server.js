@@ -52,7 +52,7 @@ function connectionTest(req, res){
 }
 
 function developers(req,res){
-  res.status(200).render('pages/developers', {title: 'About the Developers', footer: 'Home'});
+  res.status(200).render('pages/developers', {title: 'About the Developers', footer: 'Thank You for Viewing Our App'});
 }
 
 function settings(req,res){
