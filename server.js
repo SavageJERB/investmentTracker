@@ -134,12 +134,9 @@ function searchByParams(req, res){
   client
   .query(SQL, params)
   .then(result => {
-    console.log(result.rows);
     let matchStocks = result.rows;
     console.log(matchStocks)
-    let dummydata = [{companyname: "ABC", symbol: "abc"},{companyname: "XYZ", symbol: "xyz"}]
-
-    res.render('/pages/pricematch', {output:dummydata})
+    res.render('pages/pricematch', {output:matchStocks, title: "Search Results", footer: "Home"})
   })
 }
 
