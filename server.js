@@ -30,17 +30,17 @@ app.get('/', home);
 app.get('/sql_view', viewSQL);
 app.post('/searches', getStockData)//----we need an app.post
 app.post('/sql_search', searchByParams);
-app.get('/searches_green', getGreenData)
-app.get('/searches_housing', getHousingData)
-app.get('/sentiment', getSentimentData)
-app.post('/addStock', addStock)
-app.get('/sql1', insertStocks)
-app.get('/search', search)
-app.get('/setting', settings)
-app.get('/developers', developers)
-app.post('/selectedSettings', setSettings)
+app.get('/searches_green', getGreenData);
+app.get('/searches_housing', getHousingData);
+app.get('/sentiment', getSentimentData);
+app.post('/addStock', addStock);
+app.get('/sql1', insertStocks);
+app.get('/search', search);
+app.get('/setting', settings);
+app.get('/developers', developers);
+app.post('/selectedSettings', setSettings);
 
-app.get('/watchlist', buildWatchList)
+app.get('/watchlist', buildWatchList);
 app.delete('/delete/:id',deleteStock);
 //-----Error Routes
 app.use('*', routeNotFound);
@@ -282,17 +282,21 @@ function addStock(req,res){
   let userInput = req.body
   // console.log(req.body)
   const param = [userInput.companyName,userInput.symbol,userInput.sentimentResult,userInput.sector,userInput.current_price]
+
+  let SQL1 = `SELECT * FROM investment_info`;
   
   client.query(SQL, param) // information being stored in database
-  .then(result =>{
-    let finalOutput = result.rows[0]
-    // console.log(finalOutput)
-    res.render('/watchlist', {output:finalOutput, title: 'Your Watchlist', footer: 'Home'} )
-  })
+  client.query(SQL1) // Go
+  .then(results => {
+    res.redirect('/watchlist')
+
   .catch(()=>{
     res.redirect('/watchlist')
+  });
+
   })
-};
+
+}
 //----------News, Green, Housing, and Sentiment APIs Below
 function getNewsData(data){
   let tickerSymbol = data[0].symbol;
