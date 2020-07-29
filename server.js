@@ -175,6 +175,8 @@ function getStockData(req, res){
     // console.log('======================', data.body)
     .then(greenData => {
       allInfo.greencheck = greenData.green
+      console.log(greenData)
+      // allInfo.greencheck = allInfo.greencheck || "Unknown"
     });
     getNewsData(data.body)
     .then(newsData => {
@@ -317,10 +319,12 @@ function getNewsData(data){
 
 function getGreenData(data){
   let url = data[0].website;
+  console.log(url)
   let newURL = url.replace('http://', '');
   // let newURL2 = url.replace("https://", "");
   // console.log('url :',newURL);
   let API = `http://api.thegreenwebfoundation.org/greencheck/${newURL}`;
+  console.log(API);
   return superagent.get(API);
 };
 
