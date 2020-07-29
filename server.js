@@ -128,14 +128,14 @@ function getSentimentData(req, res){
 
 function searchByParams(req, res){
   let SQL = 'SELECT symbol, companyname FROM stock_info WHERE day_low > $1 AND day_high < $2 LIMIT 5';
-  console.log(req.body)
+  console.log(req.body);
   let params = [req.body.price[0], req.body.price[1]];
   
   client
   .query(SQL, params)
   .then(result => {
     let matchStocks = result.rows;
-    console.log(matchStocks)
+    console.log(matchStocks);
     res.render('pages/pricematch', {output:matchStocks, title: "Search Results", footer: "Home"})
   })
 }
