@@ -11,9 +11,10 @@
         <% output.forEach(object=>{ %>
             <section class="ui-state-default">
                 <div>
-                        <form method = "post" action = "/details">
+                        <form method = "post" action = "/searches">
 
-                            <input type="hidden" name= <%= output.symbol %>
+                            <input type="hidden" value="<%= object.symbol %>" name="symbol" >
+                            <p> P TAG: <%= object.symbol %></p>
                             <button type = "submit"> <%= object.companyname %> </br> Ticker symbol: <%= object.symbol %> </button>
                     
                         </form>
