@@ -16,7 +16,7 @@
                         
                             <summary><h3> <%= output.companyName %> </br> Ticker: <%= output.symbol%></br>Current Price: <%= output.current_price %></h3></summary>
                             <iframe src='https://wallmine.com/widgets/chart/<%=output.symbol%>' async frameborder='0' allowtransparency='true' scrolling='no' style='width: 100%; height: 450px'></iframe>
-                            <p> Sentiment Score: <%= output.sentimentResult %> <br> Stock Score (1-10, 10 being the Best Score Possible): <%= output.stockScore.toFixed(2) %> <br> Industry: <%= output.sector %></p>
+                            <p> Sentiment Score: <%= output.sentimentResult %> <br> Sustainability Score: <%= output.greencheck %><br> Overall Stock Score (1-10, 10 being the Best Score Possible): <%= output.stockScore.toFixed(2) %> <br> Industry: <%= output.sector %></p>
                             
                             <input type="hidden" name="companyName" value="<%= output.companyName %>">
                             <input type="hidden" name="symbol" value="<%= output.symbol %>">
