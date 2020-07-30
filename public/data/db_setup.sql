@@ -8,7 +8,9 @@ CREATE TABLE investment_info (
     symbol VARCHAR(20),
     current_price DECIMAL(8,2),
     sentimentResult VARCHAR(400),
+    greencheck VARCHAR(400),
     sector VARCHAR(400),
+    stockScore DECIMAL(8,2),
     UNIQUE(symbol)
 );
 
@@ -22,8 +24,8 @@ CREATE TABLE stock_info (
     UNIQUE(symbol)
 );
 
-INSERT INTO investment_info (companyName, symbol, current_price,sentimentResult, sector) VALUES ('Wang Corp', 'WAN', '1000', 'Positive', 'Technology') RETURNING *;
-INSERT INTO investment_info (companyName, symbol, current_price,sentimentResult, sector) VALUES ('Reagan Corp', 'REA', '1000', 'Positive', 'Technology') RETURNING *;
+INSERT INTO investment_info (companyName, symbol, current_price,sentimentResult,greencheck, sector) VALUES ('Wang Corp', 'WAN', '1000', 'Positive', "Green" 'Technology') RETURNING *;
+INSERT INTO investment_info (companyName, symbol, current_price,sentimentResult, sector) VALUES ('Reagan Corp', 'REA', '1000', 'Positive', 'Not Green','Technology') RETURNING *;
 -- INSTRUCTIONS:
 
 -- ////////////// WINDOWS
