@@ -48,3 +48,26 @@ footer{
         blue);
 } */
 
+.home{
+    line-height: 50px;
+    font-size: 40px;
+    
+
+}
+
+.home > *{
+    margin-bottom: 10%;
+    margin-top: 5%;
+}
+
+
+.homeTitle > h3{
+    font-weight: bold;
+    font-size: 50px;
+}
+
+.homeTitle > h5 {
+    text-align: center;
+    font-size: 25px;
+}
+

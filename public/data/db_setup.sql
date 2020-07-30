@@ -4,7 +4,7 @@ DROP TABLE IF EXISTS stock_info;
 
 CREATE TABLE investment_info (
     id SERIAL PRIMARY KEY,
-    companyName VARCHAR(255),
+    companyname VARCHAR(255),
     symbol VARCHAR(20),
     current_price DECIMAL(8,2),
     sentimentResult VARCHAR(400),
@@ -16,7 +16,7 @@ CREATE TABLE investment_info (
 
 CREATE TABLE stock_info (
     id SERIAL PRIMARY KEY,
-    companyName VARCHAR(255),
+    companyname VARCHAR(255),
     symbol VARCHAR(20),
     current_price DECIMAL(8,2),
     day_low DECIMAL(8,2),
@@ -24,8 +24,8 @@ CREATE TABLE stock_info (
     UNIQUE(symbol)
 );
 
-INSERT INTO investment_info (companyName, symbol, current_price,sentimentResult,greencheck, sector) VALUES ('Wang Corp', 'WAN', '1000', 'Positive', "Green" 'Technology') RETURNING *;
-INSERT INTO investment_info (companyName, symbol, current_price,sentimentResult, sector) VALUES ('Reagan Corp', 'REA', '1000', 'Positive', 'Not Green','Technology') RETURNING *;
+INSERT INTO investment_info (companyname, symbol, current_price,sentimentResult, greencheck, sector) VALUES ('Wang Corp', 'WAN', '1000', 'Positive', 'Green', 'Technology') RETURNING *;
+INSERT INTO investment_info (companyname, symbol, current_price,sentimentResult, greencheck, sector) VALUES ('Reagan Corp', 'REA', '1000', 'Positive', 'Not Green','Technology') RETURNING *;
 -- INSTRUCTIONS:
 
 -- ////////////// WINDOWS
