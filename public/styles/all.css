@@ -87,14 +87,26 @@ main > section {
   font-family: 'Ubuntu', sans-serif;
   font-size: 30px;
   font-weight: 450;
-  color: white;
-  background-color: rgb(52, 52, 238);
+  color: rgb(14, 12, 12);
+  background-color: rgba(0, 0, 0, 0.15);
+  /* background-color: rgba(2, 62, 138, 1); */
+  /* background-image: linear-gradient(
+    rgba(0, 150, 199, 1), 
+    rgba(3, 4, 94, 1)); */
+  box-shadow: 30px 30px 15px grey;
   line-height: 40px;
   border-radius: 60px;
   margin-bottom: 150px;
   height: auto;
   padding-bottom: 30px;
 }
+
+/* background-image: linear-gradient(
+  to bottom right,
+  rgba(0, 0, 0, .2) 20%,
+  rgba(0, 0, 255, .2) 50%,
+  white 30%
+); */
 
 main > section > div{
   width: 85%;
@@ -160,20 +172,6 @@ a{
 
 }
 
-.menu_block{
-  border: 2px solid black;
-  background-color: green;
-}
-
-
-.menu_block:hover{
-  transition-duration: 3s;
-  /* transform: rotate(10000turn); */
-  color:rgba(33, 33, 243, 0.897);
-  margin-left: 100%;
-  /* left:100%; */
-  width: 0;
-}
 .navigation > .fas{
   position: relative;
   /* bottom:100px; */
@@ -186,21 +184,19 @@ a{
 
 
 /* MENU CSS ---------------------------*/
-nav{
-  /* margin-top: 100px;
-  height: auto;
-  border-radius: 0 60px 60px 0;
-  width: 160px;
-  background-color: rgba(33, 33, 243, 0.897);
-  float: left;
-  margin-left: -19%;
-  overflow: hidden; */
-}
 
 .fas{
   margin-left: 20px;
   margin-bottom: 10vh;
   color: white;
+}
+
+.fa-github, .fa-users{
+  padding-bottom: 30px;
+  color: grey;
+  margin-right: 10%;
+  margin-left: 10%;
+  /* flex-grow: inherit; */
 }
 
 .fa-bars{
@@ -241,17 +237,22 @@ details > summary{
 
 
 .fa-4x, .fa-5x{
-  color: rgb(212, 205, 205);
-  background-color: rgb(78, 78, 80);
+  color: white;
+  background-image: linear-gradient(
+    rgba(0, 150, 199, 1), 
+    rgba(3, 4, 94, 1));
   border-radius: 60%;
   padding: 40px;
 }
 
 
 .fa-4x:hover, .fa-5x:hover{
-  color: rgb(78, 78, 80);
-  background-color: rgb(212, 205, 205);
+  color: white;
+  background-image: linear-gradient(
+    rgba(0, 119, 182, 0.5), 
+    rgba(3, 4, 94, 0.5));
   animation: icon-glow 3s infinite;
+  border: 1px solid rgba(3, 4, 94, 0.5);
 }
 
 .fa-4x:active, .fa-5x:hover:active{
@@ -260,8 +261,11 @@ details > summary{
 }
 
 @keyframes icon-glow {
-  50% {box-shadow: inset 0 0 30px blue;}
+  50% {box-shadow: inset 0 0 60px rgba(0, 119, 182, 1)}
 }
+
+
+
 
 .useInfo{
   visibility: hidden;
@@ -272,3 +276,56 @@ watchlist{
   line-height: 0;
 }
 
+.paramResults{
+  background-color: white;
+}
+
+
+
+.foot{
+width: 90%;
+/* margin: auto; */
+/* margin-left: 50%; */
+margin-top: 20%;
+
+ 
+}
+
+.appInfo{
+  margin: auto;
+}
+
+/* aside{
+  position: absolute;
+  top: 100%;
+  left: 60%;
+} */
+
+
+html{
+  height: auto;
+  width: 110%;
+}
+
+
+.header{
+  /* background-image: linear-gradient(
+    rgba(0, 150, 199, 1), 
+    rgba(3, 4, 94, 1)); */
+  background-color: rgba(0, 0, 0, 0.15);
+  box-shadow: 30px 30px 15px grey;
+}
+
+.foot{
+  background-image: linear-gradient(
+    rgba(0, 150, 199, 1), 
+    rgba(3, 4, 94, 1));
+    height: 150px;
+    line-height: 150px;
+    width: 100%;
+    border-radius: 0;
+}
+
+header{
+  margin-left: 100px;
+}
