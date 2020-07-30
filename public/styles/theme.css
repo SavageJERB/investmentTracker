@@ -1,5 +1,5 @@
 *{
-    color: rgb(255, 255, 255);
+    color: rgb(7, 6, 6);
 }
 
 body{
@@ -25,10 +25,11 @@ body{
     box-shadow: 30px 30px 15px grey;
 }r
 
-button{
-    background-image: linear-gradient(
+button, .header, .button{
+    /* background-image: linear-gradient(
         rgba(0, 119, 182, 0.5), 
-        rgba(3, 4, 94, 0.5));
+        rgba(3, 4, 94, 0.5)); */
+    /* background-color: rgba(2, 62, 138, 1); */
 }
 
 nav{

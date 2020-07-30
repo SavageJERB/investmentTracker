@@ -87,9 +87,9 @@ main > section {
   font-family: 'Ubuntu', sans-serif;
   font-size: 30px;
   font-weight: 450;
-  color: white;
-  /* background-color: rgba(0, 0, 0, 0.15); */
-  background-color: rgba(2, 62, 138, 1);
+  color: rgb(14, 12, 12);
+  background-color: rgba(0, 0, 0, 0.15);
+  /* background-color: rgba(2, 62, 138, 1); */
   /* background-image: linear-gradient(
     rgba(0, 150, 199, 1), 
     rgba(3, 4, 94, 1)); */
@@ -309,9 +309,11 @@ html{
 
 
 .header{
-  background-image: linear-gradient(
+  /* background-image: linear-gradient(
     rgba(0, 150, 199, 1), 
-    rgba(3, 4, 94, 1));
+    rgba(3, 4, 94, 1)); */
+  background-color: rgba(0, 0, 0, 0.15);
+  box-shadow: 30px 30px 15px grey;
 }
 
 .foot{
@@ -322,4 +324,8 @@ html{
     line-height: 150px;
     width: 100%;
     border-radius: 0;
+}
+
+header{
+  margin-left: 100px;
 }
