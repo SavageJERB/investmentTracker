@@ -16,11 +16,11 @@ main{
 
 /* .setting and .criteria are both also <main> tags */
 .setting, .criteria{
-    border-radius: 30px;
-    height: 40vh;
-    line-height: 40px;
+    /* border-radius: 30px; */
+    /* height: 40vh; */
+    /* line-height: 40px; */
 
-    font-size: 30px;
+    font-size: 50px;
     font-weight: 450;
 }
 

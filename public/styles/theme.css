@@ -17,36 +17,20 @@ body{
 
 
 .settings, .criteria{
-  /* background-color: rgba(0, 0, 0, 0.15); */
-  background-color: rgba(2, 62, 138, 1);
-  /* background-image: linear-gradient(
-    rgba(0, 150, 199, 1), 
-    rgba(3, 4, 94, 1)); */
+    background-color: rgba(2, 62, 138, 0.95);
     box-shadow: 30px 30px 15px grey;
-}r
+    /* font-size: 40px; */
 
-button, .header, .button{
-    /* background-image: linear-gradient(
-        rgba(0, 119, 182, 0.5), 
-        rgba(3, 4, 94, 0.5)); */
-    /* background-color: rgba(2, 62, 138, 1); */
+}
+
+.settings{
+    font-size: 50px;
+    font-weight: 500;
 }
 
 nav{
     background-color: rgba(0, 0, 0, 0);
 }
-
-
-
-/* $blue-green: rgba(0, 150, 199, 1);
-$cerulean-crayola: rgba(0, 180, 216, 1);
-$sky-blue-crayola: rgba(72, 202, 228, 1);
-
-footer{
-    background-image: linear-gradient(
-        red, 
-        blue);
-} */
 
 .home{
     line-height: 50px;
@@ -62,8 +46,8 @@ footer{
 
 
 .homeTitle > h3{
-    font-weight: bold;
-    font-size: 50px;
+    font-weight: 575;
+    font-size: 40px;
 }
 
 .homeTitle > h5 {
@@ -71,3 +55,49 @@ footer{
     font-size: 25px;
 }
 
+.header{
+    font-size: 55px;
+}
+
+.homeTitle{
+    padding: 35px;
+    padding-top: 40px;
+    /* background-color: rgba(0, 0, 0, 0.05); */
+    background-color: rgba(2, 62, 138, 0.95);
+    box-shadow: 30px 30px 15px grey;
+}
+
+input[type=radio]{
+    border: 0;
+    -webkit-transform: scale(3);
+    margin-left: 200px;
+    margin-bottom: 40px;
+    position: relative;
+    bottom: 60px;
+}
+
+
+input[type=number]{
+    height: 40px;
+    font-size: 40px;
+    width: 13%;
+    margin-top: 40px;
+}
+
+
+input[type=text]{
+    height: 40px;
+    font-size: 40px;
+    width: 55%;
+}
+
+main > .radioParams{
+    background-color: rgba(0,0,0,0);
+    box-shadow: 0 0 0 grey;
+}
+
+main > .radioParams > div > form > button{
+    background-color: rgba(0, 0, 0, 0.15);
+    border: 0;
+    box-shadow: 30px 30px 15px grey;
+}
