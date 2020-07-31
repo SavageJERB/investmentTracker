@@ -52,7 +52,7 @@ function connectionTest(req, res){
 }
 
 function developers(req,res){
-  res.status(200).render('pages/developers', {title: 'About the Developers', footer: 'Home'});
+  res.status(200).render('pages/developers', {title: 'About the Developers', footer: 'Thank You for Viewing Our App'});
 }
 
 function settings(req,res){
@@ -173,10 +173,15 @@ function getStockData(req, res){
     });
     getGreenData(data.body)
     // console.log('======================', data.body)
-    .then(greenData => {
-      allInfo.greencheck = greenData.green
-      console.log(greenData)
-      // allInfo.greencheck = allInfo.greencheck || "Unknown"
+    .then(data =>{
+      console.log(`greencheck: `,data.body.green)
+      if (data.body.green == " false"){
+      allInfo.greencheck = 'Not Green'
+      }else if (data.body.green == " true"){
+      allInfo.greencheck = 'Green'
+      }else{
+      allInfo.greencheck = 'Unknown'
+      }
     });
     getNewsData(data.body)
     .then(newsData => {
@@ -206,12 +211,17 @@ function getStockData(req, res){
             return value = 1;
           }else if(value == 'positive'){
             return value = 2;
+          }else{
+            return value = 0;
           }
         })
         
         let sentimentSum = sentimentNumbersArray.reduce((previous,current) => current += previous);
         allInfo.sentimentRawAvg = sentimentSum / sentimentNumbersArray.length
         let sentimentAvgScore = Math.round(sentimentSum / sentimentNumbersArray.length);
+        // console.log(`sentimentAvgScore:`,sentimentAvgScore)
+        // console.log(`sentimentNumbersArray:`,sentimentNumbersArray)
+        
         let sentimentResult = 'N/A'
         if(sentimentAvgScore == 0){
           sentimentResult = "Negative" 
@@ -223,11 +233,11 @@ function getStockData(req, res){
         allInfo.sentimentResult = sentimentResult;
         let rawStockScore = ((appSettings.news)*(allInfo.sentimentRawAvg)+(appSettings.housing_price)*(allInfo.housingScore))/(appSettings.news*2+appSettings.housing_price*2)
         allInfo.stockScore = rawStockScore*10
-        console.log(appSettings)
-        console.log(allInfo.sentimentRawAvg)
-        console.log(allInfo.housingScore)
-        console.log(rawStockScore)
-        console.log(allInfo)
+        // console.log(appSettings)
+        // console.log(allInfo.sentimentRawAvg)
+        // console.log(allInfo.housingScore)
+        // console.log(rawStockScore)
+        // console.log(`sentimentSum: `,sentimentSum)
         
       })
       .then(response=> res.render('pages/results', {output: allInfo, title: 'Search Results', footer: 'Home'}))
@@ -241,7 +251,7 @@ function getStockData(req, res){
 function avgHousingPrice(data){
 
   let sum = data.reduce((previous,current) => current += previous);
-  console.log(sum)
+  // console.log(sum)
   allInfo.avgHousePrice = sum/data.length;
   allInfo.avgHousePrice = allInfo.avgHousePrice || 0;
   let score = 0;
@@ -276,7 +286,7 @@ function buildWatchList(req,res){
     .then(results => {
       let dataBaseInfo = results.rows;
       // console.log(dataBaseInfo);
-      console.log(results.rows)
+      // console.log(results.rows)
       res.render('pages/watchlist', { output: dataBaseInfo, title: 'Your Watchlist', footer: 'Home'});
     }).catch(err => console.log(err));
 }
@@ -284,10 +294,10 @@ function buildWatchList(req,res){
 //----------Add Stock to Watchlist
 function addStock(req,res){
 
-  const SQL = 'INSERT INTO investment_info (companyName, symbol, sentimentResult, sector,current_price) VALUES ($1, $2, $3,$4,$5) RETURNING *';
+  const SQL = 'INSERT INTO investment_info (companyName, symbol, sentimentResult, sector, current_price, greencheck, stockScore) VALUES ($1, $2, $3,$4,$5,$6,$7) RETURNING *';
   let userInput = req.body
   // console.log(req.body)
-  const param = [userInput.companyName,userInput.symbol,userInput.sentimentResult,userInput.sector,userInput.current_price]
+  const param = [userInput.companyName,userInput.symbol,userInput.sentimentResult,userInput.sector,userInput.current_price, userInput.greencheck, userInput.stockScore]
 
   let SQL1 = `SELECT * FROM investment_info`;
   
@@ -324,8 +334,8 @@ function getGreenData(data){
   // let newURL2 = url.replace("https://", "");
   // console.log('url :',newURL);
   let API = `http://api.thegreenwebfoundation.org/greencheck/${newURL}`;
-  console.log(API);
-  return superagent.get(API);
+  // console.log(API);
+  return superagent.get(API)
 };
 
 function getHousingData(data){
